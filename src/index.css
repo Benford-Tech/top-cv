@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #eef1f6;
+  color: #0f172a;
+}
+
+/* ---- Feuille A4 ------------------------------------------------------- */
+
+.resume-page {
+  width: 210mm;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+  min-height: 297mm;
+  background: #fff;
+  box-shadow: 0 10px 40px rgb(15 23 42 / 0.16);
+  position: relative;
+}
+
+/* Repères de coupe : matérialisent où l'imprimante changera de page. */
+.page-break-guide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed #94a3b8;
+  pointer-events: none;
+}
+
+.page-break-guide::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 0;
+  top: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+/* Une entrée d'expérience ne doit pas être coupée en deux par un saut de page. */
+.avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Puces rendues à la main : le renderer PDF des navigateurs gère mal
+   les marqueurs de liste natifs quand la ligne est longue. */
+.bullet-row {
+  display: flex;
+  gap: 0.5em;
+}
+
+.bullet-dot {
+  flex: none;
+  line-height: 1.5;
+}
+
+/* ---- Champs ---------------------------------------------------------- */
+
+.field-input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d5dbe5;
+  background: #fff;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.14);
+}
+
+.field-input::placeholder {
+  color: #9aa5b5;
+}
+
+/* ---- Impression ------------------------------------------------------ */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* À l'impression la page fait ~794 px de large : les classes responsives
+     masqueraient l'aperçu, qui est pourtant le seul contenu à imprimer. */
+  .preview-pane {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .preview-pane,
+  .preview-scroll {
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+  }
+
+  /* L'aperçu est réduit à l'écran pour tenir dans le panneau ; à l'impression
+     la feuille doit retrouver sa taille réelle. */
+  .preview-scaler {
+    transform: none !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  /* La réduction d'affichage est portée par la feuille elle-même (style inline) :
+     sans ce reset le PDF sortirait à ~95 % du format A4. */
+  .resume-page {
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    /* Hauteur de page pleine : les modèles à bandeau latéral doivent colorer
+       jusqu'en bas, même quand le contenu s'arrête plus haut. */
+    min-height: 297mm !important;
+  }
+
+  .page-break-guide {
+    display: none !important;
+  }
+}
