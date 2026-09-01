@@ -1,11 +1,15 @@
 import { useRef } from 'react'
 import { Button } from './ui/controls'
-import { Download, Printer, Reset, Sparkles, Upload } from './ui/icons'
+import { formatRemaining } from '../lib/access'
+import { Clock, Download, Lock, Printer, Reset, Sparkles, Upload } from './ui/icons'
 
 export function Toolbar({
   pageCount,
   savedAt,
+  hasAccess,
+  remainingMs,
   onPrint,
+  onOpenPlans,
   onExport,
   onImport,
   onSample,
@@ -13,7 +17,10 @@ export function Toolbar({
 }: {
   pageCount: number
   savedAt: Date | null
+  hasAccess: boolean
+  remainingMs: number
   onPrint: () => void
+  onOpenPlans: () => void
   onExport: () => void
   onImport: (file: File) => void
   onSample: () => void
@@ -73,8 +80,21 @@ export function Toolbar({
         <Button variant="ghost" onClick={onExport} title="Sauvegarder les données du CV">
           <Download className="h-4 w-4" /> Exporter
         </Button>
+        {hasAccess ? (
+          <button
+            type="button"
+            onClick={onOpenPlans}
+            title="Voir votre accès et les formules"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-800 transition hover:bg-emerald-100"
+          >
+            <Clock className="h-3.5 w-3.5" />
+            Accès actif · {formatRemaining(remainingMs)}
+          </button>
+        ) : null}
+
         <Button variant="primary" onClick={onPrint}>
-          <Printer className="h-4 w-4" /> Télécharger en PDF
+          {hasAccess ? <Printer className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+          Télécharger en PDF
         </Button>
       </div>
     </header>
