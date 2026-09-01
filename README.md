@@ -29,41 +29,10 @@ déposé tel quel sur n'importe quel hébergement de fichiers.
   métier (11 familles) pour la phrase d'accroche et les descriptions de poste.
   Les repères chiffrés sont laissés en « X » à remplacer : c'est le chiffre qui
   fait la différence sur un CV.
-- **Export PDF** au format A4, soumis à un forfait de location (voir plus bas),
-  plus export / import JSON — toujours gratuit — pour reprendre un CV plus tard
-  ou le transférer d'un appareil à l'autre.
+- **Export PDF** au format A4, plus export / import JSON pour reprendre un CV
+  plus tard ou le transférer d'un appareil à l'autre.
 - **Enregistrement automatique** dans le navigateur (`localStorage`) : rien ne
   quitte le poste de l'utilisateur, photo comprise.
-
-## Location de l'accès
-
-La rédaction, l'aperçu et l'export JSON sont libres. Seul le **téléchargement
-PDF** demande un accès actif, loué pour une durée choisie :
-
-| Formule | Prix | Durée | Ramené au jour |
-| --- | --- | --- | --- |
-| Forfait journalier | 2,90 € | 24 h | 2,90 € |
-| Forfait 7 jours | 7,90 € | 7 jours | 1,13 € |
-| Forfait 30 jours | 19,90 € | 30 jours | 0,66 € |
-
-Aucune reconduction : l'accès s'arrête de lui-même à l'échéance. Souscrire une
-formule alors qu'une autre court encore **ajoute** la durée à la fin de la
-période en cours, le temps déjà payé n'est jamais perdu (`activate()` dans
-`src/lib/access.ts`).
-
-L'échéance est relue à chaque tentative de téléchargement, pas seulement au
-chargement de la page : un forfait qui expire dans un onglet resté ouvert bloque
-bien l'export suivant.
-
-> **L'accès n'est vérifié que dans le navigateur, et aucun paiement n'est
-> encaissé.** C'est une maquette fonctionnelle du modèle de location, pas une
-> protection : la date d'expiration vit dans `localStorage` et se contourne en
-> quelques secondes. Un encaissement réel supposerait un compte utilisateur, un
-> prestataire de paiement et une vérification côté serveur — le PDF devrait
-> alors être produit par le serveur, pas par le navigateur.
-
-L'export JSON reste volontairement gratuit et accessible sans forfait : un
-utilisateur doit toujours pouvoir récupérer ce qu'il a saisi.
 
 ## Choix techniques notables
 
@@ -93,14 +62,10 @@ src/
   data/defaults.ts            CV vide, CV d'exemple, palettes et polices
   data/suggestions.ts         bibliothèque de formulations par métier
   lib/useResume.ts            état de l'éditeur + enregistrement automatique
-  lib/access.ts               location de l'accès : échéance, cumul, formatage
-  lib/useAccess.ts            suivi de la location et compte à rebours
-  data/plans.ts               catalogue des forfaits
   lib/storage.ts              lecture / écriture localStorage et fichiers JSON
   lib/format.ts               dates, puces, noms de fichiers
   lib/image.ts                redimensionnement de la photo
-  components/Toolbar.tsx      barre d'actions (export, import, PDF, accès)
-  components/PaywallModal.tsx grille des forfaits de location
+  components/Toolbar.tsx      barre d'actions (export, import, PDF)
   components/editor/          formulaires, sélecteur de phrases, panneau de style
   components/preview/         feuille A4 et modèles de CV
 ```

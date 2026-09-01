@@ -1,22 +1,17 @@
 import { useCallback, useState } from 'react'
-import type { PlanId } from './data/plans'
 import { useResume } from './lib/useResume'
-import { useAccess } from './lib/useAccess'
 import { parseResumeFile } from './lib/storage'
 import { slugify } from './lib/format'
 import { Toolbar } from './components/Toolbar'
 import { EditorPanel } from './components/editor/EditorPanel'
 import { DesignPanel } from './components/editor/DesignPanel'
 import { ResumePreview } from './components/preview/ResumePreview'
-import { PaywallModal } from './components/PaywallModal'
 
 type Tab = 'contenu' | 'design'
 
 export default function App() {
   const store = useResume()
   const { resume, setResume, updateSettings, savedAt, reset, loadSample } = store
-  const access = useAccess()
-  const [plansOpen, setPlansOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('contenu')
   const [pageCount, setPageCount] = useState(1)
   /** Sur mobile les deux panneaux ne tiennent pas côte à côte : on bascule. */
@@ -33,19 +28,13 @@ export default function App() {
    * robots de tri des recruteurs, ce qu'une capture en image ne permet pas.
    */
   const handlePrint = useCallback(() => {
-    // L'accès est relu à chaque tentative plutôt qu'au montage : un forfait qui
-    // expire pendant que la page reste ouverte doit bloquer le téléchargement.
-    if (!access.isActive) {
-      setPlansOpen(true)
-      return
-    }
     const previous = document.title
     document.title = `CV-${fileName}`
     window.print()
     window.setTimeout(() => {
       document.title = previous
     }, 500)
-  }, [fileName, access.isActive])
+  }, [fileName])
 
   const handleExport = useCallback(() => {
     const blob = new Blob([JSON.stringify(resume, null, 2)], { type: 'application/json' })
@@ -56,14 +45,6 @@ export default function App() {
     link.click()
     URL.revokeObjectURL(url)
   }, [resume, fileName])
-
-  const handleChoosePlan = useCallback(
-    (planId: PlanId) => {
-      access.start(planId)
-      setPlansOpen(false)
-    },
-    [access],
-  )
 
   const handleImport = useCallback(
     async (file: File) => {
@@ -82,23 +63,11 @@ export default function App() {
       <Toolbar
         pageCount={pageCount}
         savedAt={savedAt}
-        hasAccess={access.isActive}
-        remainingMs={access.remainingMs}
         onPrint={handlePrint}
-        onOpenPlans={() => setPlansOpen(true)}
         onExport={handleExport}
         onImport={(file) => void handleImport(file)}
         onSample={loadSample}
         onReset={reset}
-      />
-
-      <PaywallModal
-        open={plansOpen}
-        onClose={() => setPlansOpen(false)}
-        onChoose={handleChoosePlan}
-        access={access.access}
-        isActive={access.isActive}
-        remainingMs={access.remainingMs}
       />
 
       {/* Bascule éditeur / aperçu, visible uniquement sur petit écran. */}
