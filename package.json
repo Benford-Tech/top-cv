@@ -6,7 +6,7 @@
   "description": "Générateur de CV en ligne — éditeur temps réel, modèles multiples, export PDF.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-static.tsx --outDir dist-ssr && node scripts/postbuild.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit"
   },

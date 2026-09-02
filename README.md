@@ -78,6 +78,36 @@ partageable et rechargeable.
 > éléments seraient fabriqués. À ajouter quand ils existeront et seront
 > vérifiables.
 
+### Référencement et partage
+
+Le site est une application React : sans précaution, le HTML livré serait une
+coquille vide. Or **les robots des réseaux sociaux — LinkedIn, WhatsApp,
+Facebook, Slack — n'exécutent pas JavaScript** : un lien partagé n'afficherait
+aucun aperçu, ce qui coupe le canal le plus naturel pour un outil de CV.
+
+`npm run build` enchaîne donc trois étapes : le bundle habituel, une seconde
+compilation en mode SSR (`src/entry-static.tsx`), puis `scripts/postbuild.mjs`
+qui :
+
+- écrit la page d'accueil rendue directement dans `dist/index.html` — le
+  fichier livré contient le texte, les titres et les modèles ;
+- y pose titre, description, balises Open Graph et Twitter, et l'URL canonique,
+  en une seule source de vérité ;
+- génère `robots.txt` (l'éditeur et `/api` sont exclus de l'indexation : ce sont
+  des applications, pas des pages) et `sitemap.xml`.
+
+Au chargement, React **hydrate** ce contenu au lieu de le reconstruire : rien ne
+clignote. Les autres chemins reçoivent le même fichier par la réécriture Vercel
+et repartent d'un conteneur vide, puisqu'ils doivent rendre autre chose.
+
+`public/og.png` (1200 × 630) est l'image de partage. Elle est composée avec les
+vrais modèles de CV, comme les vignettes de la galerie.
+
+> **`SITE_URL` est à définir dans Vercel** (par exemple
+> `https://votre-domaine.fr`). Les balises Open Graph et le plan du site exigent
+> des URL absolues ; sans cette variable, une valeur par défaut est utilisée et
+> les aperçus pointeront vers le mauvais domaine.
+
 ## Comptes, paiement et téléchargement
 
 Le CV se rédige librement, mais **le PDF ne s'obtient qu'avec un compte et

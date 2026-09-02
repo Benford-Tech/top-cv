@@ -1,4 +1,12 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+
+/**
+ * `useLayoutEffect` n'a pas d'équivalent au rendu serveur et y déclenche un
+ * avertissement. La mesure ne concerne que le navigateur : côté serveur, l'état
+ * initial (210 mm à 96 ppp, soit 794 px) suffit et donne le même HTML des deux
+ * côtés, ce qui garde l'hydratation silencieuse.
+ */
+const useMeasureEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 import type { Resume, TemplateId } from '../../types'
 import { FONTS } from '../../data/defaults'
 import { templateById } from '../preview/templates'
@@ -22,7 +30,7 @@ export function TemplateShowcase({
   const { Component } = templateById(id)
   const font = FONTS.find((item) => item.id === resume.settings.font) ?? FONTS[0]
 
-  useLayoutEffect(() => {
+  useMeasureEffect(() => {
     const page = pageRef.current
     if (!page?.offsetWidth) return
     setScale(width / page.offsetWidth)
