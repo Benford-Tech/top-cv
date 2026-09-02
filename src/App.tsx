@@ -4,6 +4,7 @@ import { useAuth, bearer } from './lib/useAuth'
 import { useCloudResume } from './lib/useCloudResume'
 import { slugify } from './lib/format'
 import { parseResumeFile } from './lib/storage'
+import { describeFailure, describeNetworkFailure, readJson } from './lib/http'
 import { Toolbar } from './components/Toolbar'
 import { AuthPanel } from './components/AuthPanel'
 import { UnlockModal, type Price } from './components/UnlockModal'
@@ -77,14 +78,13 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
 
       if (response.status === 402) {
         // Pas encore payé : on annonce le montant et on laisse la main.
-        const payload = await response.json()
-        setPrice({ amount: payload.amount ?? 0, currency: payload.currency ?? 'eur' })
+        const payload = await readJson<{ amount?: number; currency?: string }>(response)
+        setPrice({ amount: payload?.amount ?? 0, currency: payload?.currency ?? 'eur' })
         return
       }
 
       if (!response.ok) {
-        const payload = await response.json().catch(() => null)
-        setMessage(payload?.message ?? 'Le téléchargement a échoué.')
+        setMessage(describeFailure(response, await readJson(response), 'Le téléchargement a échoué.'))
         return
       }
 
@@ -95,7 +95,7 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
       link.click()
       URL.revokeObjectURL(link.href)
     } catch {
-      setMessage('Le service de téléchargement est injoignable.')
+      setMessage(describeNetworkFailure('Le téléchargement a échoué.'))
     } finally {
       setBusy(false)
     }
@@ -110,16 +110,16 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
         method: 'POST',
         headers: bearer(auth.session),
       })
-      const payload = await checkout.json()
-      if (checkout.ok && payload.url) {
-        window.location.href = payload.url as string
+      const payload = await readJson<{ url?: string; message?: string }>(checkout)
+      if (checkout.ok && payload?.url) {
+        window.location.href = payload.url
         return
       }
       setPrice(null)
-      setMessage(payload.message ?? 'Le paiement n’a pas pu être ouvert.')
+      setMessage(describeFailure(checkout, payload, 'Le paiement n’a pas pu être ouvert.'))
     } catch {
       setPrice(null)
-      setMessage('Le service de paiement est injoignable.')
+      setMessage(describeNetworkFailure('Le paiement n’a pas pu être ouvert.'))
     } finally {
       setBusy(false)
     }

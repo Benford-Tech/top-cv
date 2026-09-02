@@ -12,8 +12,20 @@ npm run build    # bundle statique dans dist/
 npm run preview  # sert le bundle construit
 ```
 
-Aucun serveur ni base de données : le site est entièrement statique et peut être
-déposé tel quel sur n'importe quel hébergement de fichiers.
+`npm run dev` sert aussi les fonctions du dossier `api/` : import LinkedIn par
+URL, paiement et génération du PDF sont donc testables en local, avec le même
+code qu'en production. Copiez `.env.example` vers `.env` et renseignez ce dont
+vous avez besoin — le fichier est lu au démarrage, y compris les variables sans
+préfixe `VITE_`, et il est exclu du dépôt.
+
+Sans `.env`, les fonctions répondent `501` en expliquant ce qui manque : le site
+reste utilisable, seules les fonctionnalités concernées sont désactivées.
+
+> `npm run preview` sert le bundle construit **sans** les fonctions `api/` :
+> c'est un serveur de fichiers statiques. Pour tester l'API, utilisez
+> `npm run dev`. Un appel à `/api/…` qui échoue affiche désormais la cause
+> exacte — absence de déploiement, erreur de la fonction, configuration
+> manquante ou coupure réseau — au lieu d'un message unique.
 
 ## Ce que fait l'application
 

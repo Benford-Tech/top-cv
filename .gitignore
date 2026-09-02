@@ -3,3 +3,7 @@ dist
 dist-ssr
 *.local
 *.tsbuildinfo
+# Variables locales : clés d'API, jamais versionnées (.env.example documente les noms)
+.env
+.env.*
+!.env.example

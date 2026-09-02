@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { Resume } from '../../types'
 import type { LinkedInImport } from '../../lib/linkedin'
 import { isEmptyImport, readLinkedInExport } from '../../lib/linkedin'
+import { describeFailure, describeNetworkFailure, readJson } from '../../lib/http'
 import { Button, TextInput } from '../ui/controls'
 import { Check, Close, LinkedIn, Upload } from '../ui/icons'
 
@@ -45,26 +46,25 @@ export function LinkedInModal({
     if (!target) return
     setFetching(true)
     setError('')
+    const repli = 'Vous pouvez toujours passer par l’archive d’export, juste en dessous.'
     try {
       const response = await fetch(`/api/linkedin?url=${encodeURIComponent(target)}`)
-      const payload = await response.json()
-      if (!response.ok) {
-        setError(
-          payload?.message ??
-            "La récupération a échoué. Vous pouvez toujours passer par l'archive d'export.",
-        )
+      // Le statut d'abord : le corps d'une erreur n'est pas toujours du JSON.
+      const payload = await readJson<LinkedInImport & { message?: string }>(response)
+
+      if (!response.ok || !payload) {
+        setError(describeFailure(response, payload, repli))
         setData(null)
         return
       }
+
       const profile = { ...payload, linkedinUrl: payload.linkedinUrl || target } as LinkedInImport
       setData(profile)
       if (isEmptyImport(profile)) {
         setError('Le profil a été joint, mais il ne contient aucune donnée exploitable.')
       }
     } catch {
-      setError(
-        "Le service de récupération est injoignable. Sur un déploiement statique sans fonction serveur, il n'existe pas — utilisez l'archive d'export.",
-      )
+      setError(describeNetworkFailure(repli))
       setData(null)
     } finally {
       setFetching(false)
