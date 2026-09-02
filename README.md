@@ -63,12 +63,24 @@ saturerait à elle seule.
 | --- | --- |
 | `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, fiches métier, questions fréquentes. |
 | `/cv/<métier>` | 21 fiches : ce que le recruteur regarde, erreurs propres au métier, formulations à reprendre. |
+| `/cv/<situation>` | 6 fiches : étudiant, sans expérience, alternance, reconversion, interruption, après 50 ans. Ce qui change n'est pas le contenu mais l'ordre des sections et la formulation. |
 | `/modeles/<modèle>` | 5 fiches : à qui le modèle convient, quand en préférer un autre, déclinaisons de couleur. |
 | `/editeur` | L'application d'édition du CV. |
 
 `src/routes.ts` est la liste unique des pages indexables : elle sert au rendu
 dans le navigateur, au prérendu et au plan du site. Aucune page ne peut donc
 être publiée sans métadonnées, ni oubliée du sitemap.
+
+Métiers et situations partagent le préfixe `/cv/`, parce qu'ils répondent à la
+même forme de requête (« cv comptable », « cv reconversion »). Un identifiant en
+double ferait silencieusement disparaître une page derrière l'autre :
+`scripts/postbuild.mjs` refuse donc de construire si deux fiches réclament la
+même adresse.
+
+Les fiches situation ne conseillent jamais de dissimuler quoi que ce soit. Les
+dates sont vérifiées par les recruteurs, et une omission découverte coûte plus
+cher que le fait qu'elle masquait — la page sur les interruptions le dit
+explicitement.
 
 Les vignettes de la galerie sont rendues par **les composants du CV eux-mêmes**,
 réduits à l'échelle : un modèle modifié se voit immédiatement sur la page

@@ -4,6 +4,7 @@ import { TEMPLATES } from './components/preview/templates'
 import { SUGGESTIONS } from './data/suggestions'
 import { FAQ } from './content/faq'
 import { JOB_PAGES } from './content/jobs'
+import { SITUATION_PAGES } from './content/situations'
 import { TemplateShowcase } from './components/landing/TemplateShowcase'
 import { Check, LinkedIn, Lock, Printer, Sparkles } from './components/ui/icons'
 
@@ -260,6 +261,32 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
             ))}
           </ul>
         </div>
+      </section>
+
+      {/* ---- Situations de candidature ---- */}
+      <section className="mx-auto max-w-6xl px-5 py-16">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          Et si votre situation ne rentre pas dans les cases
+        </h2>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          Premier CV, changement de voie, interruption dans le parcours : ce n’est pas le contenu
+          qui change, c’est l’ordre des sections et la façon de dire les choses.
+        </p>
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {SITUATION_PAGES.map((item) => (
+            <li key={item.slug}>
+              <a
+                href={`/cv/${item.slug}`}
+                className="block h-full rounded-xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50/40"
+              >
+                <span className="block text-sm font-semibold text-slate-900">{item.h1}</span>
+                <span className="mt-1 block text-xs leading-relaxed text-slate-500">
+                  {item.principle.title}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ---- Questions ---- */}

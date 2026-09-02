@@ -1,4 +1,5 @@
 import { JOB_PAGES } from './content/jobs'
+import { SITUATION_PAGES } from './content/situations'
 import { TEMPLATE_COPY } from './content/templates'
 
 export const SITE_TITLE = 'CV Studio — créez un CV professionnel et téléchargez-le en PDF'
@@ -24,6 +25,12 @@ export const ROUTES: RouteMeta[] = [
     path: `/cv/${job.slug}`,
     title: job.metaTitle,
     description: job.metaDescription,
+    priority: 0.8,
+  })),
+  ...SITUATION_PAGES.map((situation) => ({
+    path: `/cv/${situation.slug}`,
+    title: situation.metaTitle,
+    description: situation.metaDescription,
     priority: 0.8,
   })),
   ...TEMPLATE_COPY.map((template) => ({

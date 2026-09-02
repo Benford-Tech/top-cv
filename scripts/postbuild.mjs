@@ -98,6 +98,13 @@ function head(route) {
 `
 }
 
+// Métiers et situations partagent le préfixe /cv/ : un identifiant en double
+// ferait silencieusement disparaître une page derrière l'autre.
+const doublons = ROUTES.map((r) => r.path).filter((p, i, all) => all.indexOf(p) !== i)
+if (doublons.length > 0) {
+  throw new Error(`Adresses en double dans la table des routes : ${[...new Set(doublons)].join(', ')}`)
+}
+
 const shell = readFileSync('dist/index.html', 'utf8')
 
 for (const route of ROUTES) {

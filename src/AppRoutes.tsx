@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
 import { matchRoute } from './routes'
 import { jobBySlug } from './content/jobs'
+import { situationBySlug } from './content/situations'
 import { templateCopy } from './content/templates'
 import type { TemplateId } from './types'
 import { Landing } from './Landing'
 import { JobPageView } from './pages/JobPageView'
+import { SituationPageView } from './pages/SituationPageView'
 import { TemplatePageView } from './pages/TemplatePageView'
 
 /**
@@ -18,9 +20,17 @@ export function renderForPath(
 ): ReactNode {
   const match = matchRoute(path)
 
+  // Sous /cv/, un identifiant désigne soit un métier, soit une situation de
+  // candidature : les deux répondent à la même forme de requête, autant les
+  // ranger au même endroit.
   if (match.kind === 'job') {
     const job = jobBySlug(match.slug)
     if (job) return <JobPageView job={job} onStart={handlers.onStart} />
+
+    const situation = situationBySlug(match.slug)
+    if (situation) {
+      return <SituationPageView situation={situation} onStart={handlers.onStart} />
+    }
   }
 
   if (match.kind === 'template') {
