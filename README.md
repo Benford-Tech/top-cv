@@ -245,8 +245,12 @@ un bundle public. D'où la fonction serveur — la configuration Vercel du dép�
 la déploie automatiquement.
 
 Aucun fournisseur n'est codé en dur. L'endpoint, la clé, le nom du paramètre et
-l'en-tête d'authentification se déclarent en variables d'environnement (voir
-`.env.example`), ce qui permet d'en changer sans toucher au code. C'est
+la façon de transmettre la clé se déclarent en variables d'environnement (voir
+`.env.example`), ce qui permet d'en changer sans toucher au code. Les deux
+conventions d'authentification du marché sont prises en charge : clé en en-tête
+(`Authorization: Bearer …` par défaut) ou clé en paramètre d'URL
+(`LINKEDIN_API_KEY_PARAM`), cette dernière étant celle de plusieurs
+prestataires actuels. C'est
 volontaire : **Proxycurl, longtemps la référence du secteur, a fermé le
 4 juillet 2026** après une action en justice de LinkedIn — reprochant des
 centaines de milliers de faux comptes et l'aspiration de données non publiques,

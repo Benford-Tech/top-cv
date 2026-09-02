@@ -59,18 +59,25 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const param = process.env.LINKEDIN_API_PARAM || 'linkedin_profile_url'
+  // Certains fournisseurs attendent la clé en paramètre d'URL plutôt qu'en
+  // en-tête. Les deux conventions sont courantes : on prend en charge l'une ou
+  // l'autre selon la variable renseignée.
+  const keyParam = process.env.LINKEDIN_API_KEY_PARAM
   const authHeader = process.env.LINKEDIN_API_AUTH_HEADER || 'Authorization'
   const authPrefix = process.env.LINKEDIN_API_AUTH_PREFIX ?? 'Bearer '
 
   const providerUrl = new URL(endpoint)
   providerUrl.searchParams.set(param, target)
+  if (keyParam) providerUrl.searchParams.set(keyParam, key)
 
   const abort = new AbortController()
   const timeout = setTimeout(() => abort.abort(), 15_000)
 
   try {
     const response = await fetch(providerUrl, {
-      headers: { [authHeader]: `${authPrefix}${key}`, accept: 'application/json' },
+      headers: keyParam
+        ? { accept: 'application/json' }
+        : { [authHeader]: `${authPrefix}${key}`, accept: 'application/json' },
       signal: abort.signal,
     })
 
