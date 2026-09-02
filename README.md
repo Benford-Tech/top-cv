@@ -54,6 +54,28 @@ Des repères en pointillés matérialisent les changements de page.
 `localStorage` est de quelques mégaoctets, une photo brute d'appareil le
 saturerait à elle seule.
 
+## Déploiement
+
+Le site est entièrement statique : il se construit en `dist/` et se sert depuis
+n'importe quel hébergement de fichiers. `vercel.json` fixe la configuration
+Vercel (framework Vite, `npm run build`, sortie `dist/`) et met les fichiers de
+`assets/` en cache immuable — ils portent une empreinte de contenu dans leur nom,
+un nouveau build produit de nouveaux noms.
+
+Le plus simple est d'importer le dépôt depuis le tableau de bord Vercel
+(*Add New… → Project*) : chaque poussée sur `main` redéploie, chaque branche
+obtient son aperçu. Aucun réglage à saisir, `vercel.json` suffit.
+
+En ligne de commande, depuis une machine authentifiée :
+
+```bash
+npx vercel        # aperçu
+npx vercel --prod # production
+```
+
+Aucune variable d'environnement n'est nécessaire : il n'y a ni API, ni clé, ni
+service externe à joindre au moment du build.
+
 ## Structure
 
 ```
