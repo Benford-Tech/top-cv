@@ -1,0 +1,267 @@
+import type { LinkedInImport } from './linkedin'
+import { uid } from './id'
+
+/**
+ * Analyse d'un CV existant, quel que soit son origine : document Word, ou PDF
+ * qui ne vient pas de LinkedIn.
+ *
+ * Contrairement a l'export LinkedIn, un CV n'a aucune structure garantie :
+ * chacun invente ses intitules, son ordre et sa disposition. L'analyse ne peut
+ * donc etre que du meilleur effort. Elle vise ce qui fait gagner le plus de
+ * temps a la ressaisie — identite, coordonnees, blocs d'experience et de
+ * formation reperes par leurs dates, competences et langues — et l'ecran
+ * d'import montre ce qui a ete reconnu pour que l'utilisateur corrige le reste.
+ */
+
+type Section =
+  | 'header'
+  | 'profile'
+  | 'experience'
+  | 'education'
+  | 'skills'
+  | 'languages'
+  | 'other'
+
+/** Intitules de rubriques rencontres sur les CV francais et anglais. */
+const HEADINGS: [Section, string[]][] = [
+  ['profile', ['profil', 'a propos', 'resume', 'presentation', 'objectif', 'accroche', 'summary', 'about', 'profile', 'objective']],
+  ['experience', ['experience', 'experiences', 'experience professionnelle', 'experiences professionnelles', 'parcours professionnel', 'parcours', 'emplois', 'work experience', 'employment', 'professional experience']],
+  ['education', ['formation', 'formations', 'etudes', 'diplomes', 'parcours academique', 'scolarite', 'education', 'academic background']],
+  ['skills', ['competences', 'competence', 'competences techniques', 'savoir faire', 'skills', 'technical skills', 'core skills']],
+  ['languages', ['langues', 'languages', 'language']],
+  ['other', ['centres d interet', 'centre d interet', 'loisirs', 'interets', 'hobbies', 'interests', 'certifications', 'references', 'divers']],
+]
+
+function normalise(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function headingFor(line: string): Section | null {
+  if (line.length > 45) return null
+  const clean = normalise(line)
+  if (!clean) return null
+  for (const [section, labels] of HEADINGS) {
+    if (labels.includes(clean)) return section
+  }
+  return null
+}
+
+const MONTHS: Record<string, string> = {
+  janvier: '01', fevrier: '02', mars: '03', avril: '04', mai: '05', juin: '06',
+  juillet: '07', aout: '08', septembre: '09', octobre: '10', novembre: '11', decembre: '12',
+  janv: '01', fevr: '02', avr: '04', juil: '07', sept: '09', oct: '10', nov: '11', dec: '12',
+  january: '01', february: '02', march: '03', april: '04', may: '05', june: '06',
+  july: '07', august: '08', september: '09', october: '10', november: '11', december: '12',
+  jan: '01', feb: '02', mar: '03', apr: '04', jun: '06', jul: '07', aug: '08', nov2: '11',
+}
+
+const NOW = /^(aujourd hui|present|actuel|actuelle|en cours|a ce jour|now|current)$/
+
+/** Rend « 2021-03 » pour un mois, « 2021 » pour une annee seule, sinon ''. */
+function moment(value: string): string {
+  const text = normalise(value)
+  if (!text) return ''
+
+  const slash = /^(\d{1,2}) (\d{4})$/.exec(text)
+  if (slash) return `${slash[2]}-${slash[1].padStart(2, '0')}`
+
+  const named = /^([a-z]+) (\d{4})$/.exec(text)
+  if (named) {
+    const month = MONTHS[named[1]]
+    return month ? `${named[2]}-${month}` : named[2]
+  }
+
+  const year = /^(\d{4})$/.exec(text)
+  return year ? year[1] : ''
+}
+
+export type DateRange = { start: string; end: string; current: boolean; rest: string }
+
+/**
+ * Cherche une plage de dates n'importe ou dans la ligne et rend ce qui reste.
+ *
+ * Les deux dispositions courantes sont couvertes : la date sur sa propre ligne
+ * (« mars 2021 - aujourd'hui »), et la date en tete de ligne suivie de
+ * l'intitule (« 2019 - 2022 : Chef de projet, Acme »), frequente sur les CV
+ * rediges sous Word.
+ */
+export function findRange(line: string): DateRange | null {
+  const token = String.raw`(?:\d{1,2}[/.]\d{4}|[A-Za-zÀ-ÿ]{3,10}\.?\s+\d{4}|\d{4})`
+  const tail = String.raw`(?:${token}|aujourd'hui|pr[ée]sent|actuel(?:le)?|en cours|[àa] ce jour|now|current|present)`
+  const pattern = new RegExp(
+    String.raw`(?:depuis\s+(${token}))|(${token})\s*(?:[-–—]|\bau?\b|\bto\b)\s*(${tail})`,
+    'i',
+  )
+  const match = pattern.exec(line)
+  if (!match) return null
+
+  const rest = line.replace(match[0], ' ').replace(/\s*[:|–—-]\s*/g, ' ').replace(/\s+/g, ' ').trim()
+
+  // « Depuis 2021 » : un seul repere, poste en cours.
+  if (match[1]) {
+    const start = moment(match[1].replace(/[/.]/g, ' '))
+    return start ? { start, end: '', current: true, rest } : null
+  }
+
+  const start = moment(match[2].replace(/[/.]/g, ' '))
+  if (!start) return null
+
+  const endRaw = match[3]
+  if (NOW.test(normalise(endRaw))) return { start, end: '', current: true, rest }
+
+  const end = moment(endRaw.replace(/[/.]/g, ' '))
+  return end ? { start, end, current: false, rest } : null
+}
+
+/**
+ * Coupe « Chef de projet chez Acme » ou « Master de gestion, Universite Lyon 2 »
+ * en intitule et employeur. La virgule ne demande pas d'espace avant elle : sur
+ * un CV elle est collee au mot precedent.
+ */
+function splitRole(text: string): { position: string; company: string } {
+  const cut = /\s+(?:chez|at|@)\s+|\s*[—–|]\s+|,\s+/.exec(text)
+  if (!cut) return { position: text.trim(), company: '' }
+  return {
+    position: text.slice(0, cut.index).trim(),
+    company: text.slice(cut.index + cut[0].length).trim(),
+  }
+}
+
+const LIST_SEPARATOR = /\s*[,;·•|\/]\s*/
+
+const EMPTY: LinkedInImport = {
+  firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '',
+  experiences: [], education: [], skills: [], languages: [], recommendations: [],
+  filesUsed: [], filesIgnored: [],
+}
+
+export function parseResumeLines(input: string[]): LinkedInImport {
+  const lines = input.map((line) => line.replace(/\s+/g, ' ').trim()).filter(Boolean)
+
+  const result: LinkedInImport = {
+    ...EMPTY,
+    experiences: [], education: [], skills: [], languages: [], recommendations: [],
+    filesUsed: [], filesIgnored: [],
+  }
+
+  // --- Coordonnees, cherchees dans tout le document -------------------------
+  const whole = lines.join('\n')
+  const email = /[\w.+-]+@[\w-]+\.[a-z]{2,}/i.exec(whole)
+  if (email) result.email = email[0]
+  const profile = /(?:www\.)?linkedin\.com\/in\/[\w-]+/i.exec(whole)
+  if (profile) result.linkedinUrl = profile[0]
+
+  // --- Decoupage en rubriques ----------------------------------------------
+  const sections = new Map<Section, string[]>()
+  let current: Section = 'header'
+  for (const line of lines) {
+    const heading = headingFor(line)
+    if (heading) {
+      current = heading
+      if (!sections.has(current)) sections.set(current, [])
+      continue
+    }
+    if (!sections.has(current)) sections.set(current, [])
+    sections.get(current)!.push(line)
+  }
+
+  // --- Identite : premieres lignes avant toute rubrique ---------------------
+  const header = sections.get('header') ?? []
+  const nameLine = header.find(
+    (line) => /^[^\d@]{3,60}$/.test(line) && line.split(' ').length <= 5,
+  )
+  if (nameLine) {
+    const [first, ...rest] = nameLine.split(' ')
+    result.firstName = first
+    result.lastName = rest.join(' ')
+    const after = header[header.indexOf(nameLine) + 1]
+    if (after && !/@|\d{4}/.test(after) && after.length < 80) result.headline = after
+  }
+  const city = header.find((line) => /\b\d{5}\b/.test(line) || (line.includes(',') && line.length < 50))
+  if (city) result.city = city
+
+  const profileLines = sections.get('profile')
+  if (profileLines?.length) result.summary = profileLines.join(' ')
+
+  // --- Experiences et formations, ancrees sur les dates ---------------------
+  function collect(section: Section) {
+    const source = sections.get(section) ?? []
+    const entries: { head: string[]; body: string[]; range: DateRange }[] = []
+    let buffer: string[] = []
+
+    for (const line of source) {
+      const range = findRange(line)
+      if (!range) {
+        if (entries.length > 0 && buffer.length === 0) entries[entries.length - 1].body.push(line)
+        else buffer.push(line)
+        continue
+      }
+      // La date porte parfois l'intitule sur la meme ligne ; sinon on reprend
+      // les lignes qui la precedent.
+      const head = range.rest ? [range.rest, ...buffer] : buffer
+      entries.push({ head, body: [], range })
+      buffer = []
+    }
+    return entries
+  }
+
+  for (const entry of collect('experience')) {
+    const first = entry.head[0] ?? ''
+    const { position, company } = splitRole(first)
+    result.experiences.push({
+      id: uid(),
+      position,
+      company: company || entry.head[1] || '',
+      city: '',
+      start: entry.range.start,
+      end: entry.range.end,
+      current: entry.range.current,
+      description: entry.body.join('\n'),
+    })
+  }
+
+  for (const entry of collect('education')) {
+    const first = entry.head[0] ?? ''
+    const { position, company } = splitRole(first)
+    result.education.push({
+      id: uid(),
+      degree: position,
+      school: company || entry.head[1] || '',
+      city: '',
+      start: entry.range.start,
+      end: entry.range.end,
+      description: entry.body.join('\n'),
+    })
+  }
+
+  // --- Competences et langues ----------------------------------------------
+  for (const line of sections.get('skills') ?? []) {
+    for (const name of line.replace(/^[-•·]\s*/, '').split(LIST_SEPARATOR)) {
+      const clean = name.trim()
+      if (clean && clean.length < 60) result.skills.push({ id: uid(), name: clean, level: 4 })
+    }
+  }
+
+  for (const line of sections.get('languages') ?? []) {
+    for (const chunk of line.split(/\s*[;·•|]\s*/)) {
+      const clean = chunk.replace(/^[-•·]\s*/, '').trim()
+      if (!clean) continue
+      // Trois ecritures courantes : « Anglais : courant », « Anglais (C1) »,
+      // « Anglais - courant ». Le niveau est tout ce qui suit, parentheses
+      // englobantes retirees seulement si elles encadrent l'ensemble.
+      const colon = /^([^:]+):\s*(.+)$/.exec(clean)
+      const paren = /^(.+?)\s*\((.+)\)$/.exec(clean)
+      const dash = /^(.+?)\s+[-–—]\s+(.+)$/.exec(clean)
+      const found = colon ?? paren ?? dash
+      if (found) result.languages.push({ id: uid(), name: found[1].trim(), level: found[2].trim() })
+      else result.languages.push({ id: uid(), name: clean, level: '' })
+    }
+  }
+
+  return result
+}

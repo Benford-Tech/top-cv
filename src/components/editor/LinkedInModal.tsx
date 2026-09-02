@@ -112,7 +112,7 @@ export function LinkedInModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Importer depuis LinkedIn"
+        aria-label="Importer un CV existant"
         onClick={(event) => event.stopPropagation()}
         className="w-full max-w-2xl overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl"
       >
@@ -121,11 +121,10 @@ export function LinkedInModal({
             <LinkedIn className="h-5 w-5" />
           </span>
           <div className="flex-1">
-            <h2 className="text-base font-semibold text-slate-900">Importer depuis LinkedIn</h2>
+            <h2 className="text-base font-semibold text-slate-900">Partir d’un CV existant</h2>
             <p className="mt-0.5 text-xs text-slate-500">
-              Deux fichiers gratuits que LinkedIn remet à ses membres suffisent : le PDF de
-              votre profil, immédiat, ou l’archive de données, plus complète. Aucun compte tiers
-              n’est nécessaire.
+              Un CV Word ou PDF que vous avez déjà, ou un fichier LinkedIn. Tout est lu dans
+              votre navigateur, sans compte tiers.
             </p>
           </div>
           <button
@@ -169,9 +168,17 @@ export function LinkedInModal({
             <span className="h-px flex-1 bg-slate-200" />
           </div>
 
-          <p className="text-xs font-semibold text-slate-800">
-            Par un fichier que LinkedIn vous donne — gratuit
-          </p>
+          <p className="text-xs font-semibold text-slate-800">Par un fichier — gratuit</p>
+
+          <div className="rounded-lg border border-blue-200 bg-blue-50/60 p-3 text-xs text-blue-900">
+            <p className="font-semibold">Vous avez déjà un CV ? Déposez-le</p>
+            <p className="mt-1 leading-relaxed">
+              Un document <strong>Word (.docx)</strong> ou un <strong>PDF</strong> : les rubriques
+              sont reconnues à partir de leurs intitulés et des dates. Les CV étant tous
+              différents, relisez le résultat — c’est un gain de ressaisie, pas une conversion
+              exacte. Le format .doc doit d’abord être réenregistré en .docx.
+            </p>
+          </div>
 
           <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 text-xs text-emerald-900">
             <p className="font-semibold">Le plus rapide : le PDF de votre profil</p>
@@ -209,14 +216,14 @@ export function LinkedInModal({
           <input
             ref={input}
             type="file"
-            accept=".pdf,.zip,.csv"
+            accept=".docx,.pdf,.zip,.csv"
             multiple
             className="hidden"
             onChange={(event) => void handleFiles(event.target.files)}
           />
           <Button variant="ghost" onClick={() => input.current?.click()} disabled={busy}>
             <Upload className="h-4 w-4" />
-            {busy ? 'Lecture…' : 'Choisir le PDF, l’archive ZIP ou des fichiers CSV'}
+            {busy ? 'Lecture…' : 'Choisir un fichier (Word, PDF, archive ZIP ou CSV)'}
           </Button>
 
           {error ? (

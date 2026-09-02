@@ -68,11 +68,10 @@ export function EditorPanel({ store }: { store: Store }) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-slate-900">
-            Partir de votre profil LinkedIn
+            Partir d’un CV existant
           </span>
           <span className="block text-xs text-slate-500">
-            Expériences, formations, compétences et recommandations, depuis votre export de
-            données
+            Un document Word ou PDF, ou votre profil LinkedIn — lu dans votre navigateur
           </span>
         </span>
       </button>

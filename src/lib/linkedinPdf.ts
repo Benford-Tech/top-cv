@@ -1,5 +1,6 @@
 import type { LinkedInImport } from './linkedin'
 import { uid } from './id'
+import { parseResumeLines } from './cvParser'
 
 /**
  * Lecture du PDF que LinkedIn produit via « Enregistrer au format PDF ».
@@ -250,7 +251,16 @@ export async function readLinkedInPdf(file: File): Promise<LinkedInImport> {
     pages.push(text)
   }
 
-  const parsed = parseLinkedInPdfText(pages.join('\n'))
-  parsed.filesUsed = [file.name]
-  return parsed
+  const text = pages.join('\n')
+  const parsed = parseLinkedInPdfText(text)
+
+  // Tous les PDF deposes ici ne viennent pas de LinkedIn : quand la structure
+  // de l'export n'est pas reconnue, on retombe sur l'analyse generique, qui
+  // sait lire un CV ordinaire.
+  const utile =
+    parsed.experiences.length > 0 || parsed.education.length > 0 || parsed.skills.length > 0
+  const resultat = utile ? parsed : parseResumeLines(text.split('\n'))
+
+  resultat.filesUsed = [file.name]
+  return resultat
 }

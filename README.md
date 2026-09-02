@@ -227,6 +227,31 @@ Trois verrous, du plus externe au plus interne :
 Sans ces variables, l'application reste utilisable comme brouillon local et
 annonce clairement que le téléchargement n'est pas disponible.
 
+## Partir d'un CV existant
+
+Un CV **Word (.docx)** ou **PDF** déjà rédigé peut être déposé dans l'éditeur :
+identité, coordonnées, expériences, formations, compétences et langues en sont
+extraites. Le fichier est lu **dans le navigateur**, rien n'est envoyé nulle part.
+
+Un CV n'a aucune structure garantie — chacun invente ses intitulés et sa
+disposition. L'analyse (`src/lib/cvParser.ts`) repose donc sur deux repères
+robustes : les **intitulés de rubriques** (français et anglais) et les **plages
+de dates**, reconnues sous leurs formes courantes — « mars 2021 – aujourd'hui »,
+« 09/2018 - 02/2021 », « 2016 – 2018 », « Depuis 2021 » — qu'elles soient seules
+sur leur ligne ou suivies de l'intitulé, comme c'est fréquent sous Word.
+
+C'est un gain de ressaisie, pas une conversion exacte : l'écran d'import affiche
+le décompte de ce qui a été reconnu, section par section, et le résultat est à
+relire.
+
+> Le format **.doc** (Word 97-2003) est un binaire propriétaire illisible dans un
+> navigateur. L'application le détecte et demande de réenregistrer en `.docx` ou
+> d'exporter en PDF, plutôt que d'échouer sans explication.
+
+Le texte du `.docx` est extrait avec `fflate`, déjà présent pour l'archive
+LinkedIn : un `.docx` est une archive ZIP dont `word/document.xml` porte le
+contenu. Aucune dépendance supplémentaire.
+
 ## Import LinkedIn
 
 L'application peut préremplir un CV depuis LinkedIn : expériences, formations,

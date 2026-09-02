@@ -235,9 +235,10 @@ export function isEmptyImport(data: LinkedInImport): boolean {
 }
 
 /**
- * Accepte les trois fichiers gratuits que LinkedIn remet à ses membres :
- * l'archive ZIP d'export, les CSV qu'on en aurait extraits, ou le PDF produit
- * par « Enregistrer au format PDF » depuis un profil.
+ * Point d'entrée unique de l'import : archive ZIP LinkedIn, CSV qui en sont
+ * extraits, PDF de profil LinkedIn, mais aussi CV existant au format Word ou
+ * PDF ordinaire — ces deux derniers passant par une analyse générique, faute
+ * de structure garantie.
  */
 export async function readLinkedInExport(fileList: File[]): Promise<LinkedInImport> {
   const contents: Record<string, string> = {}
@@ -249,6 +250,28 @@ export async function readLinkedInExport(fileList: File[]): Promise<LinkedInImpo
   if (pdf) {
     const { readLinkedInPdf } = await import('./linkedinPdf')
     return readLinkedInPdf(pdf)
+  }
+
+  // Un CV existant sous Word : le document est lu puis analysé par le lecteur
+  // générique, faute de structure garantie dans ce format.
+  const word = fileList.find((file) => file.name.toLowerCase().endsWith('.docx'))
+  if (word) {
+    const [{ readDocxLines }, { parseResumeLines }] = await Promise.all([
+      import('./docx'),
+      import('./cvParser'),
+    ])
+    const parsed = parseResumeLines(await readDocxLines(word))
+    parsed.filesUsed = [word.name]
+    return parsed
+  }
+
+  // Le format .doc, antérieur à 2007, est un binaire propriétaire illisible
+  // dans un navigateur : mieux vaut le dire que d'échouer sans explication.
+  const legacy = fileList.find((file) => /\.docx?$/i.test(file.name))
+  if (legacy) {
+    throw new Error(
+      'Le format .doc (Word 97-2003) ne peut pas être lu ici. Ouvrez le document et enregistrez-le en .docx, ou exportez-le en PDF.',
+    )
   }
 
   for (const file of fileList) {
