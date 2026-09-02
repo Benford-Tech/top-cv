@@ -2,6 +2,7 @@ import type { Resume } from '../../src/types'
 import { authenticate, config, json, notConfigured, unauthorized } from '../_lib/auth'
 import { renderResumeHtml } from '../_lib/renderResume'
 import { renderPdf } from '../_lib/pdf'
+import { priceConfig } from '../_lib/price'
 
 export const runtime = 'nodejs'
 // Chromium démarre lentement à froid et le rendu d'un CV long prend quelques
@@ -40,11 +41,17 @@ export default async function handler(request: Request): Promise<Response> {
   if (!data) return json({ error: 'not_found' }, 404)
 
   if (!data.paid) {
+    // Le montant accompagne le refus : l'interface peut l'annoncer avant
+    // d'envoyer qui que ce soit vers le paiement, et il vient de la même
+    // source que celui facturé.
+    const price = priceConfig()
     return json(
       {
         error: 'payment_required',
         message: 'Ce CV n’a pas encore été débloqué.',
         resumeId: data.id,
+        amount: price.amount,
+        currency: price.currency,
       },
       402,
     )

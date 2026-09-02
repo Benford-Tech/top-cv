@@ -5,8 +5,6 @@ import { SUGGESTIONS } from './data/suggestions'
 import { TemplateShowcase } from './components/landing/TemplateShowcase'
 import { Check, LinkedIn, Lock, Printer, Sparkles } from './components/ui/icons'
 
-const PRICE = '4,90 €'
-
 /**
  * Page d'accueil publique. Tout ce qui y est affirmé doit correspondre à ce que
  * l'application fait réellement : les modèles présentés sont les composants du
@@ -30,7 +28,7 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
     },
     {
       title: 'Téléchargez votre PDF',
-      body: `Un paiement unique de ${PRICE} débloque ce CV définitivement, modifications ultérieures comprises.`,
+      body: 'Créez votre compte et débloquez ce CV définitivement — modifications et retéléchargements ultérieurs compris.',
     },
   ]
 
@@ -58,7 +56,7 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
     {
       icon: <Lock className="h-5 w-5" />,
       title: 'Paiement unique',
-      body: 'Pas d’abonnement, pas de reconduction automatique, rien à résilier. Vous payez un CV, il reste à vous.',
+      body: 'Pas d’abonnement, pas de reconduction automatique, rien à résilier. Vous payez un CV une fois, il reste à vous.',
     },
     {
       icon: <Check className="h-5 w-5" />,
@@ -70,7 +68,7 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
   const faq = [
     {
       q: 'Combien ça coûte ?',
-      a: `${PRICE} par CV, une seule fois. La rédaction, l’aperçu et l’export de vos données sont gratuits : le paiement n’intervient qu’au téléchargement du PDF.`,
+      a: 'La rédaction, l’aperçu et l’export de vos données sont gratuits. Seul le téléchargement du PDF est payant : le montant s’affiche au moment de télécharger, une fois votre CV terminé et avant tout engagement.',
     },
     {
       q: 'C’est un abonnement déguisé ?',
@@ -105,10 +103,10 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
           <span className="text-sm font-semibold text-slate-900">CV Studio</span>
           <nav className="ml-auto flex items-center gap-2">
             <a
-              href="#tarif"
+              href="#modeles"
               className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-600 transition hover:text-slate-900 sm:block"
             >
-              Tarif
+              Modèles
             </a>
             <button
               type="button"
@@ -166,8 +164,8 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
             </div>
 
             <p className="mt-4 text-sm text-slate-500">
-              Rédaction et aperçu gratuits. {PRICE} une seule fois pour télécharger le PDF —
-              sans abonnement.
+              Rédaction et aperçu gratuits, sans compte. Le téléchargement du PDF est payant, une
+              seule fois — sans abonnement.
             </p>
           </div>
 
@@ -252,47 +250,6 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
         </div>
       </section>
 
-      {/* ---- Tarif ---- */}
-      <section id="tarif" className="border-y border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-3xl px-5 py-16 text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-            Un prix, affiché avant de commencer
-          </h2>
-          <p className="mt-2 text-slate-600">
-            Vous savez ce que vous paierez avant d’écrire la première ligne.
-          </p>
-
-          <div className="mx-auto mt-8 max-w-md rounded-2xl border-2 border-blue-600 bg-white p-7 text-left shadow-sm">
-            <p className="text-sm font-semibold text-blue-700">Téléchargement d’un CV</p>
-            <p className="mt-1 text-4xl font-bold text-slate-900">{PRICE}</p>
-            <p className="text-sm text-slate-500">paiement unique, sans abonnement</p>
-
-            <ul className="mt-5 space-y-2">
-              {[
-                'Rédaction et aperçu gratuits, sans compte',
-                'PDF A4 au texte sélectionnable',
-                'Modifications et retéléchargements illimités',
-                'Aucune reconduction : rien à résilier',
-                'Export de vos données en JSON, gratuit',
-              ].map((line) => (
-                <li key={line} className="flex gap-2 text-sm text-slate-700">
-                  <Check className="mt-0.5 h-4 w-4 flex-none text-blue-600" />
-                  {line}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              onClick={onStart}
-              className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700"
-            >
-              Commencer gratuitement
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* ---- Questions ---- */}
       <section className="mx-auto max-w-3xl px-5 py-16">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Questions fréquentes</h2>
@@ -339,9 +296,6 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
           <span>CV Studio</span>
           <a href="#modeles" className="hover:text-slate-800">
             Modèles
-          </a>
-          <a href="#tarif" className="hover:text-slate-800">
-            Tarif
           </a>
           <span className="ml-auto">
             Sans lien avec LinkedIn Corporation. LinkedIn est une marque de son propriétaire.

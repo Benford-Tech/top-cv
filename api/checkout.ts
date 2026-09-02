@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { authenticate, config, json, notConfigured, unauthorized } from './_lib/auth'
+import { priceConfig } from './_lib/price'
 
 export const runtime = 'nodejs'
 
@@ -47,7 +48,7 @@ export default async function handler(request: Request): Promise<Response> {
   const stripe = new Stripe(secret)
   const origin = request.headers.get('origin') ?? new URL(request.url).origin
   const priceId = process.env.STRIPE_PRICE_ID
-  const amount = Number(process.env.CV_PRICE_CENTS ?? 490)
+  const price = priceConfig()
 
   const checkout = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -63,8 +64,8 @@ export default async function handler(request: Request): Promise<Response> {
         : {
             quantity: 1,
             price_data: {
-              currency: process.env.CV_PRICE_CURRENCY ?? 'eur',
-              unit_amount: amount,
+              currency: price.currency,
+              unit_amount: price.amount,
               product_data: { name: `Téléchargement PDF — ${resume.title}` },
             },
           },

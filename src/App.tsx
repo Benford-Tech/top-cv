@@ -6,6 +6,7 @@ import { slugify } from './lib/format'
 import { parseResumeFile } from './lib/storage'
 import { Toolbar } from './components/Toolbar'
 import { AuthPanel } from './components/AuthPanel'
+import { UnlockModal, type Price } from './components/UnlockModal'
 import { EditorPanel } from './components/editor/EditorPanel'
 import { DesignPanel } from './components/editor/DesignPanel'
 import { ResumePreview } from './components/preview/ResumePreview'
@@ -25,6 +26,9 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
   const [authReason, setAuthReason] = useState<string | undefined>()
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  // Le tarif n'est pas connu du client : il arrive avec le refus du serveur,
+  // ce qui garantit que le montant annoncé est celui qui sera facturé.
+  const [price, setPrice] = useState<Price | null>(null)
 
   const fileName = slugify(
     `${resume.personal.firstName} ${resume.personal.lastName}`.trim(),
@@ -72,17 +76,9 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
       })
 
       if (response.status === 402) {
-        // Pas encore payé : on ouvre le paiement pour ce CV.
-        const checkout = await fetch(`/api/checkout?id=${cloud.resumeId}`, {
-          method: 'POST',
-          headers: bearer(auth.session),
-        })
-        const payload = await checkout.json()
-        if (checkout.ok && payload.url) {
-          window.location.href = payload.url as string
-          return
-        }
-        setMessage(payload.message ?? 'Le paiement n’a pas pu être ouvert.')
+        // Pas encore payé : on annonce le montant et on laisse la main.
+        const payload = await response.json()
+        setPrice({ amount: payload.amount ?? 0, currency: payload.currency ?? 'eur' })
         return
       }
 
@@ -104,6 +100,30 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
       setBusy(false)
     }
   }, [auth.session, cloud.resumeId, fileName])
+
+  /** Départ vers Stripe, une fois le montant vu et accepté. */
+  const handleCheckout = useCallback(async () => {
+    if (!auth.session || !cloud.resumeId) return
+    setBusy(true)
+    try {
+      const checkout = await fetch(`/api/checkout?id=${cloud.resumeId}`, {
+        method: 'POST',
+        headers: bearer(auth.session),
+      })
+      const payload = await checkout.json()
+      if (checkout.ok && payload.url) {
+        window.location.href = payload.url as string
+        return
+      }
+      setPrice(null)
+      setMessage(payload.message ?? 'Le paiement n’a pas pu être ouvert.')
+    } catch {
+      setPrice(null)
+      setMessage('Le service de paiement est injoignable.')
+    } finally {
+      setBusy(false)
+    }
+  }, [auth.session, cloud.resumeId])
 
   /**
    * Export des données brutes. Réservé au titulaire du compte : c'est sa
@@ -145,6 +165,14 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
           return error
         }}
         onSignUp={auth.signUp}
+      />
+
+      <UnlockModal
+        open={price !== null}
+        price={price}
+        busy={busy}
+        onConfirm={() => void handleCheckout()}
+        onClose={() => setPrice(null)}
       />
 
       <Toolbar

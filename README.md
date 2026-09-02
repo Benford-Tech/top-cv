@@ -61,7 +61,7 @@ saturerait à elle seule.
 
 | Chemin | Contenu |
 | --- | --- |
-| `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, tarif, questions fréquentes. |
+| `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, questions fréquentes. |
 | `/editeur` | L'application d'édition du CV. |
 
 Les vignettes de la galerie sont rendues par **les composants du CV eux-mêmes**,
@@ -83,6 +83,14 @@ partageable et rechargeable.
 Le CV se rédige librement, mais **le PDF ne s'obtient qu'avec un compte et
 après paiement**, à l'unité : un règlement débloque définitivement ce CV, y
 compris après modification.
+
+**Le montant n'est pas affiché sur la page d'accueil**, mais au moment du
+téléchargement, une fois le CV terminé. Il ne vient pas du code du navigateur :
+c'est la réponse `402` de `api/cv/pdf.ts` qui le transporte, à partir de
+`CV_PRICE_CENTS`. Le montant annoncé et celui facturé par Stripe ont donc la
+même source et ne peuvent pas diverger. La page d'accueil dit en revanche que le
+téléchargement est payant : laisser croire à la gratuité puis présenter un
+paywall après vingt minutes de saisie serait déloyal.
 
 ### Pourquoi le PDF est fabriqué par le serveur
 
