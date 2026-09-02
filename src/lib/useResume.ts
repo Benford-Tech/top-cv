@@ -130,6 +130,7 @@ export function useResume() {
       incoming: Partial<Pick<Resume, ListKey>> & {
         firstName?: string
         lastName?: string
+        linkedinUrl?: string
         headline?: string
         summary?: string
         city?: string
@@ -154,6 +155,9 @@ export function useResume() {
         }
         if (incoming.lastName && !prev.personal.lastName) {
           next.personal = { ...next.personal, lastName: incoming.lastName }
+        }
+        if (incoming.linkedinUrl && !prev.personal.linkedin) {
+          next.personal = { ...next.personal, linkedin: incoming.linkedinUrl }
         }
         if (incoming.headline && !prev.personal.title) {
           next.personal = { ...next.personal, title: incoming.headline }

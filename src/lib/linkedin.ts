@@ -17,6 +17,8 @@ import { pick, toRecords, type CsvRow } from './csv'
 export type LinkedInImport = {
   firstName: string
   lastName: string
+  /** Renseignée seulement quand l'import vient d'une URL de profil. */
+  linkedinUrl: string
   headline: string
   summary: string
   city: string
@@ -167,6 +169,7 @@ function matches(path: string, ...names: string[]): boolean {
 const EMPTY: LinkedInImport = {
   firstName: '',
   lastName: '',
+  linkedinUrl: '',
   headline: '',
   summary: '',
   city: '',

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import type { Resume } from '../../types'
 import type { LinkedInImport } from '../../lib/linkedin'
 import { isEmptyImport, readLinkedInExport } from '../../lib/linkedin'
-import { Button } from '../ui/controls'
+import { Button, TextInput } from '../ui/controls'
 import { Check, Close, LinkedIn, Upload } from '../ui/icons'
 
 type SectionKey = 'experiences' | 'education' | 'skills' | 'languages' | 'recommendations'
@@ -30,8 +30,46 @@ export function LinkedInModal({
   const [mode, setMode] = useState<'replace' | 'append'>('replace')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [url, setUrl] = useState('')
+  const [fetching, setFetching] = useState(false)
 
   if (!open) return null
+
+  /**
+   * Passe par la fonction serveur : LinkedIn et les fournisseurs de données
+   * n'émettent pas d'en-têtes CORS, et la clé d'API ne doit pas se retrouver
+   * dans le bundle public.
+   */
+  async function fetchByUrl() {
+    const target = url.trim()
+    if (!target) return
+    setFetching(true)
+    setError('')
+    try {
+      const response = await fetch(`/api/linkedin?url=${encodeURIComponent(target)}`)
+      const payload = await response.json()
+      if (!response.ok) {
+        setError(
+          payload?.message ??
+            "La récupération a échoué. Vous pouvez toujours passer par l'archive d'export.",
+        )
+        setData(null)
+        return
+      }
+      const profile = { ...payload, linkedinUrl: payload.linkedinUrl || target } as LinkedInImport
+      setData(profile)
+      if (isEmptyImport(profile)) {
+        setError('Le profil a été joint, mais il ne contient aucune donnée exploitable.')
+      }
+    } catch {
+      setError(
+        "Le service de récupération est injoignable. Sur un déploiement statique sans fonction serveur, il n'existe pas — utilisez l'archive d'export.",
+      )
+      setData(null)
+    } finally {
+      setFetching(false)
+    }
+  }
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return
@@ -85,8 +123,9 @@ export function LinkedInModal({
           <div className="flex-1">
             <h2 className="text-base font-semibold text-slate-900">Importer depuis LinkedIn</h2>
             <p className="mt-0.5 text-xs text-slate-500">
-              LinkedIn n’ouvre ni les expériences ni les recommandations à son API : on passe donc
-              par l’export de données, que vous seul pouvez demander.
+              Par l’adresse du profil, si un fournisseur de données est configuré — ou par
+              l’archive d’export, qui ne dépend de personne et contient toujours les
+              recommandations.
             </p>
           </div>
           <button
@@ -100,6 +139,38 @@ export function LinkedInModal({
         </header>
 
         <div className="space-y-4 px-6 py-5">
+          <div className="space-y-2 rounded-lg border border-slate-200 p-3">
+            <p className="text-xs font-semibold text-slate-800">
+              Par l’adresse du profil
+            </p>
+            <div className="flex gap-2">
+              <TextInput
+                value={url}
+                onChange={(event) => setUrl(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') void fetchByUrl()
+                }}
+                placeholder="https://www.linkedin.com/in/votre-identifiant"
+              />
+              <Button variant="primary" onClick={() => void fetchByUrl()} disabled={fetching || !url.trim()}>
+                {fetching ? 'Recherche…' : 'Récupérer'}
+              </Button>
+            </div>
+            <p className="text-xs text-slate-500">
+              Nécessite un fournisseur de données configuré sur le déploiement. Les
+              recommandations ne sont pas toujours restituées par ces services — l’archive, elle,
+              les contient toujours.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-slate-200" />
+            <span className="text-[11px] uppercase tracking-wider text-slate-400">ou</span>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <p className="text-xs font-semibold text-slate-800">Par l’archive d’export</p>
+
           <ol className="space-y-1.5 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
             <li>
               <strong className="font-medium text-slate-800">1.</strong> Sur LinkedIn :
@@ -208,8 +279,9 @@ export function LinkedInModal({
 
         <footer className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
           <p className="text-xs text-slate-500">
-            L’archive est lue localement. Relisez toujours ce qui a été importé : LinkedIn ne
-            distingue pas les niveaux de compétence, tous arrivent à 4 sur 5.
+            Relisez toujours ce qui a été importé : LinkedIn ne note pas les compétences, toutes
+            arrivent à 4 sur 5. L’archive est lue dans votre navigateur ; la recherche par adresse
+            passe, elle, par un service tiers.
           </p>
           <Button
             variant="primary"

@@ -18,7 +18,8 @@ déposé tel quel sur n'importe quel hébergement de fichiers.
 ## Ce que fait l'application
 
 - **Import LinkedIn** — expériences, formations, compétences, langues et
-  recommandations reçues, depuis l'export de données du compte (voir plus bas).
+  recommandations reçues, par l'adresse du profil ou par l'export de données du
+  compte (voir plus bas).
 - **Éditeur avec aperçu instantané** — informations personnelles, profil,
   expériences, formation, compétences (avec niveau), langues et recommandations. Les entrées se
   réordonnent et se suppriment, les titres de section se renomment.
@@ -61,8 +62,47 @@ saturerait à elle seule.
 L'application peut préremplir un CV depuis LinkedIn : expériences, formations,
 compétences, langues, identité **et recommandations reçues**.
 
-**Ce n'est pas une connexion de compte, et ce n'est pas un oubli.** LinkedIn
-n'ouvre pas ces données :
+Deux voies, selon ce que le déploiement offre.
+
+### Par l'adresse du profil
+
+Un champ accepte `https://www.linkedin.com/in/identifiant` et interroge la
+fonction serveur `api/linkedin.ts`, qui relaie vers un fournisseur de données.
+
+**Cela ne peut pas se faire depuis le navigateur** : ni LinkedIn ni ces
+fournisseurs n'émettent d'en-têtes CORS, et une clé d'API n'a rien à faire dans
+un bundle public. D'où la fonction serveur — la configuration Vercel du dépôt
+la déploie automatiquement.
+
+Aucun fournisseur n'est codé en dur. L'endpoint, la clé, le nom du paramètre et
+l'en-tête d'authentification se déclarent en variables d'environnement (voir
+`.env.example`), ce qui permet d'en changer sans toucher au code. C'est
+volontaire : **Proxycurl, longtemps la référence du secteur, a fermé le
+4 juillet 2026** après une action en justice de LinkedIn — reprochant des
+centaines de milliers de faux comptes et l'aspiration de données non publiques,
+et non le principe du profil public. Les acteurs restants relèvent de trois
+familles : moissonneurs temps réel, revendeurs de bases, et API adossées à un
+compte réel.
+
+Sans variables d'environnement, l'endpoint répond `501` et l'interface propose
+l'archive. Les erreurs du fournisseur sont renvoyées sous forme de code
+seulement : ni la clé ni les détails d'infrastructure ne remontent au navigateur.
+
+**À peser avant de brancher un fournisseur :**
+
+- cela repose sur l'aspiration de profils LinkedIn, ce que ses conditions
+  d'utilisation interdisent — le risque contractuel est chez le fournisseur,
+  mais il retombe sur le service qui s'y adosse ;
+- l'URL du profil est transmise à un tiers, et il s'agit de données
+  personnelles : le RGPD s'applique, y compris quand la personne traite ses
+  propres données via votre service ;
+- chaque recherche est facturée, et la disponibilité dépend d'un acteur externe ;
+- les recommandations ne sont pas restituées par tous les fournisseurs.
+
+### Par l'archive d'export
+
+Sans dépendance externe, et c'est la seule voie qui garantit les
+recommandations. LinkedIn n'ouvre pas ces données par ses propres interfaces :
 
 - l'OAuth public (*Sign In with LinkedIn / OpenID Connect*) ne rend que le nom,
   la photo et l'adresse e-mail — ni postes, ni formations, ni compétences ;
@@ -71,9 +111,9 @@ n'ouvre pas ces données :
 - le scraping est interdit par les conditions d'utilisation, et bloqué en
   pratique.
 
-La seule source complète et légitime est donc l'export que chaque membre peut
-demander pour lui-même : *Préférences et confidentialité → Confidentialité des
-données → Obtenir une copie de vos données*. L'archive ZIP se dépose dans
+L'export que chaque membre peut demander pour lui-même contourne tout cela :
+*Préférences et confidentialité → Confidentialité des données → Obtenir une
+copie de vos données*. L'archive ZIP se dépose dans
 l'application, qui la lit **dans le navigateur** — elle n'est envoyée nulle part.
 
 Fichiers exploités : `Profile.csv`, `Positions.csv`, `Education.csv`,
@@ -120,8 +160,9 @@ npx vercel        # aperçu
 npx vercel --prod # production
 ```
 
-Aucune variable d'environnement n'est nécessaire : il n'y a ni API, ni clé, ni
-service externe à joindre au moment du build.
+Aucune variable d'environnement n'est nécessaire pour le build. Celles de
+`.env.example` ne servent qu'à la recherche par adresse de profil : sans elles,
+le site fonctionne, et seule cette voie d'import est désactivée.
 
 ## Structure
 
@@ -136,6 +177,9 @@ src/
   lib/image.ts                redimensionnement de la photo
   lib/csv.ts                  lecteur CSV conforme à RFC 4180
   lib/linkedin.ts             lecture de l'archive d'export LinkedIn
+  lib/linkedinProfile.ts      normalisation de la réponse d'un fournisseur
+api/
+  linkedin.ts                 relais serveur vers le fournisseur de données
   components/Toolbar.tsx      barre d'actions (export, import, PDF)
   components/editor/          formulaires, sélecteur de phrases, import LinkedIn,
                               panneau de style
