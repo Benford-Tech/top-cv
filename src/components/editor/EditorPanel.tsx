@@ -1,8 +1,10 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { useResume } from '../../lib/useResume'
 import { readPhoto } from '../../lib/image'
+import type { LinkedInImport } from '../../lib/linkedin'
 import { Button, Field, TextArea, TextInput } from '../ui/controls'
-import { Plus } from '../ui/icons'
+import { LinkedIn, Plus } from '../ui/icons'
+import { LinkedInModal } from './LinkedInModal'
 import { SectionCard } from './SectionCard'
 import { EntryCard } from './EntryCard'
 import { SuggestionPicker } from './SuggestionPicker'
@@ -16,9 +18,28 @@ function append(current: string, phrase: string): string {
 }
 
 export function EditorPanel({ store }: { store: Store }) {
-  const { resume, updatePersonal, update, updateLabel, addItem, updateItem, removeItem, moveItem } =
-    store
+  const {
+    resume,
+    updatePersonal,
+    update,
+    updateLabel,
+    addItem,
+    updateItem,
+    removeItem,
+    moveItem,
+    applyImport,
+  } = store
   const photoInput = useRef<HTMLInputElement>(null)
+  const [linkedInOpen, setLinkedInOpen] = useState(false)
+
+  function handleLinkedIn(
+    data: LinkedInImport,
+    chosen: Parameters<typeof applyImport>[1],
+    mode: 'replace' | 'append',
+  ) {
+    applyImport(data, chosen, mode)
+    setLinkedInOpen(false)
+  }
 
   async function onPhotoChange(file: File | undefined) {
     if (!file) return
@@ -31,6 +52,31 @@ export function EditorPanel({ store }: { store: Store }) {
 
   return (
     <div className="space-y-4">
+      <LinkedInModal
+        open={linkedInOpen}
+        onClose={() => setLinkedInOpen(false)}
+        onImport={handleLinkedIn}
+      />
+
+      <button
+        type="button"
+        onClick={() => setLinkedInOpen(true)}
+        className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition hover:border-[#0a66c2] hover:shadow"
+      >
+        <span className="grid h-9 w-9 flex-none place-items-center rounded-lg bg-[#0a66c2] text-white">
+          <LinkedIn className="h-5 w-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-slate-900">
+            Partir de votre profil LinkedIn
+          </span>
+          <span className="block text-xs text-slate-500">
+            Expériences, formations, compétences et recommandations, depuis votre export de
+            données
+          </span>
+        </span>
+      </button>
+
       {/* ---- Informations personnelles ---- */}
       <SectionCard title="Informations personnelles">
         <div className="flex gap-4">
@@ -402,6 +448,61 @@ export function EditorPanel({ store }: { store: Store }) {
         </div>
         <Button onClick={() => addItem('skills')}>
           <Plus className="h-4 w-4" /> Ajouter une compétence
+        </Button>
+      </SectionCard>
+
+      {/* ---- Recommandations ---- */}
+      <SectionCard
+        title={resume.labels.recommendations}
+        onTitleChange={(value) => updateLabel('recommendations', value)}
+        subtitle="Deux extraits courts valent mieux qu'une page entière"
+        defaultOpen={resume.recommendations.length > 0}
+      >
+        {resume.recommendations.map((item, index) => (
+          <EntryCard
+            key={item.id}
+            index={index}
+            count={resume.recommendations.length}
+            title={item.author}
+            meta={item.role}
+            onMove={(delta) => moveItem('recommendations', item.id, delta)}
+            onRemove={() => removeItem('recommendations', item.id)}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Auteur">
+                <TextInput
+                  value={item.author}
+                  onChange={(event) =>
+                    updateItem('recommendations', item.id, { author: event.target.value })
+                  }
+                  placeholder="Sofia Renard"
+                />
+              </Field>
+              <Field label="Poste et société">
+                <TextInput
+                  value={item.role}
+                  onChange={(event) =>
+                    updateItem('recommendations', item.id, { role: event.target.value })
+                  }
+                  placeholder="Directrice de production, Atelier Nova"
+                />
+              </Field>
+            </div>
+            <Field label="Extrait" hint="Un CV n'a pas la place d'une recommandation entière">
+              <TextArea
+                rows={3}
+                value={item.text}
+                onChange={(event) =>
+                  updateItem('recommendations', item.id, { text: event.target.value })
+                }
+                placeholder="Camille a repris un projet en difficulté et l'a livré dans les délais…"
+              />
+            </Field>
+          </EntryCard>
+        ))}
+
+        <Button onClick={() => addItem('recommendations')}>
+          <Plus className="h-4 w-4" /> Ajouter une recommandation
         </Button>
       </SectionCard>
 

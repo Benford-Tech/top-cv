@@ -1,5 +1,13 @@
 import { formatRange } from '../../../lib/format'
-import { Bullets, LevelBar, Photo, contactItems, fullName, type TemplateProps } from './parts'
+import {
+  Bullets,
+  LevelBar,
+  Photo,
+  RecommendationList,
+  contactItems,
+  fullName,
+  type TemplateProps,
+} from './parts'
 
 const SIDEBAR = '66mm'
 
@@ -153,7 +161,7 @@ export function Colonne({ resume, accent }: TemplateProps) {
         ) : null}
 
         {resume.education.length > 0 ? (
-          <section>
+          <section style={{ marginBottom: '6mm' }}>
             {mainHeading(labels.education)}
             {resume.education.map((item) => (
               <article key={item.id} className="avoid-break" style={{ marginBottom: '3.5mm' }}>
@@ -170,6 +178,13 @@ export function Colonne({ resume, accent }: TemplateProps) {
                 ) : null}
               </article>
             ))}
+          </section>
+        ) : null}
+
+        {resume.recommendations.length > 0 ? (
+          <section>
+            {mainHeading(labels.recommendations)}
+            <RecommendationList items={resume.recommendations} accent={accent} />
           </section>
         ) : null}
       </main>

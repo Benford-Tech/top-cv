@@ -45,6 +45,14 @@ export type Language = {
   level: string
 }
 
+export type Recommendation = {
+  id: string
+  author: string
+  /** Poste et société de l'auteur, tels qu'ils apparaissaient au moment de l'écriture. */
+  role: string
+  text: string
+}
+
 export type TemplateId = 'moderne' | 'classique' | 'colonne' | 'minimal' | 'creatif'
 
 export type Settings = {
@@ -59,7 +67,13 @@ export type Settings = {
 
 export type FontId = 'inter' | 'lato' | 'serif' | 'slab'
 
-export type SectionId = 'summary' | 'experiences' | 'education' | 'skills' | 'languages'
+export type SectionId =
+  | 'summary'
+  | 'experiences'
+  | 'education'
+  | 'skills'
+  | 'languages'
+  | 'recommendations'
 
 export type Resume = {
   personal: Personal
@@ -68,6 +82,7 @@ export type Resume = {
   education: Education[]
   skills: Skill[]
   languages: Language[]
+  recommendations: Recommendation[]
   /** Titres personnalisables des sections du CV. */
   labels: Record<SectionId, string>
   settings: Settings

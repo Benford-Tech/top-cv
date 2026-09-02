@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react'
 import { formatRange } from '../../../lib/format'
-import { Bullets, contactItems, fullName, type TemplateProps } from './parts'
+import {
+  Bullets,
+  RecommendationList,
+  contactItems,
+  fullName,
+  type TemplateProps,
+} from './parts'
 
 /** Grille à deux colonnes : les dates à gauche, le contenu à droite. */
 function Row({ label, children }: { label: string; children: ReactNode }) {
@@ -115,6 +121,13 @@ export function Minimal({ resume, accent }: TemplateProps) {
               ) : null}
             </Row>
           ))}
+        </section>
+      ) : null}
+
+      {resume.recommendations.length > 0 ? (
+        <section style={{ marginBottom: '9mm' }}>
+          {heading(labels.recommendations)}
+          <RecommendationList items={resume.recommendations} accent={accent} />
         </section>
       ) : null}
 

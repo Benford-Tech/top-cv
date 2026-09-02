@@ -20,6 +20,7 @@ function hydrate(raw: unknown): Resume | null {
     education: data.education ?? [],
     skills: data.skills ?? [],
     languages: data.languages ?? [],
+    recommendations: data.recommendations ?? [],
     summary: data.summary ?? '',
   }
 }

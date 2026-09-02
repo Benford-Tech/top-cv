@@ -1,5 +1,13 @@
 import { formatRange } from '../../../lib/format'
-import { Bullets, LevelBar, Photo, contactItems, fullName, type TemplateProps } from './parts'
+import {
+  Bullets,
+  LevelBar,
+  Photo,
+  RecommendationList,
+  contactItems,
+  fullName,
+  type TemplateProps,
+} from './parts'
 
 export function Moderne({ resume, accent }: TemplateProps) {
   const { personal, settings, labels } = resume
@@ -121,6 +129,13 @@ export function Moderne({ resume, accent }: TemplateProps) {
               ) : null}
             </article>
           ))}
+        </section>
+      ) : null}
+
+      {resume.recommendations.length > 0 ? (
+        <section style={{ marginTop: '7mm' }}>
+          {heading(labels.recommendations)}
+          <RecommendationList items={resume.recommendations} accent={accent} />
         </section>
       ) : null}
 

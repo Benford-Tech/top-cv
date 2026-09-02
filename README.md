@@ -17,8 +17,10 @@ déposé tel quel sur n'importe quel hébergement de fichiers.
 
 ## Ce que fait l'application
 
+- **Import LinkedIn** — expériences, formations, compétences, langues et
+  recommandations reçues, depuis l'export de données du compte (voir plus bas).
 - **Éditeur avec aperçu instantané** — informations personnelles, profil,
-  expériences, formation, compétences (avec niveau) et langues. Les entrées se
+  expériences, formation, compétences (avec niveau), langues et recommandations. Les entrées se
   réordonnent et se suppriment, les titres de section se renomment.
 - **5 modèles** — Moderne, Classique, Deux colonnes, Minimal, Créatif —
   interchangeables à tout moment sans perdre le contenu saisi.
@@ -54,6 +56,51 @@ Des repères en pointillés matérialisent les changements de page.
 `localStorage` est de quelques mégaoctets, une photo brute d'appareil le
 saturerait à elle seule.
 
+## Import LinkedIn
+
+L'application peut préremplir un CV depuis LinkedIn : expériences, formations,
+compétences, langues, identité **et recommandations reçues**.
+
+**Ce n'est pas une connexion de compte, et ce n'est pas un oubli.** LinkedIn
+n'ouvre pas ces données :
+
+- l'OAuth public (*Sign In with LinkedIn / OpenID Connect*) ne rend que le nom,
+  la photo et l'adresse e-mail — ni postes, ni formations, ni compétences ;
+- l'API profil complète est réservée au *LinkedIn Partner Program*, sur dossier ;
+- **aucune API LinkedIn n'expose les recommandations**, partenaire ou non ;
+- le scraping est interdit par les conditions d'utilisation, et bloqué en
+  pratique.
+
+La seule source complète et légitime est donc l'export que chaque membre peut
+demander pour lui-même : *Préférences et confidentialité → Confidentialité des
+données → Obtenir une copie de vos données*. L'archive ZIP se dépose dans
+l'application, qui la lit **dans le navigateur** — elle n'est envoyée nulle part.
+
+Fichiers exploités : `Profile.csv`, `Positions.csv`, `Education.csv`,
+`Skills.csv`, `Languages.csv`, `Email Addresses.csv` et
+`Recommendations_Received.csv`. Les CSV isolés sont acceptés aussi, si l'archive
+a déjà été décompressée.
+
+Quelques partis pris de lecture :
+
+- une date de fin vide sur un poste vaut « poste actuel » ;
+- une recommandation dont le statut n'est pas `VISIBLE` est ignorée — ce qui est
+  masqué sur le profil n'a pas à surgir sur un CV ;
+- LinkedIn ne note pas les compétences : elles arrivent toutes à 4 sur 5, à
+  ajuster ensuite ;
+- les champs d'identité (nom, titre, ville, e-mail, profil) ne sont remplis que
+  s'ils sont vides — un import n'écrase jamais ce qui a été saisi à la main ;
+- au choix, l'import **remplace** les sections retenues ou **s'ajoute** à leur
+  suite.
+
+> Les intitulés de colonnes et de fichiers varient selon la version de l'export
+> et la langue du compte. Le lecteur les compare de façon souple (casse, accents
+> et ponctuation ignorés, plusieurs intitulés acceptés), et l'écran d'import
+> affiche le décompte de ce qui a réellement été reconnu, section par section :
+> un export atypique se voit au lieu de passer inaperçu. Le lecteur a été validé
+> sur une archive de test reproduisant la structure documentée, pas sur toutes
+> les variantes existantes.
+
 ## Déploiement
 
 Le site est entièrement statique : il se construit en `dist/` et se sert depuis
@@ -87,8 +134,11 @@ src/
   lib/storage.ts              lecture / écriture localStorage et fichiers JSON
   lib/format.ts               dates, puces, noms de fichiers
   lib/image.ts                redimensionnement de la photo
+  lib/csv.ts                  lecteur CSV conforme à RFC 4180
+  lib/linkedin.ts             lecture de l'archive d'export LinkedIn
   components/Toolbar.tsx      barre d'actions (export, import, PDF)
-  components/editor/          formulaires, sélecteur de phrases, panneau de style
+  components/editor/          formulaires, sélecteur de phrases, import LinkedIn,
+                              panneau de style
   components/preview/         feuille A4 et modèles de CV
 ```
 

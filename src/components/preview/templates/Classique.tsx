@@ -1,5 +1,11 @@
 import { formatRange } from '../../../lib/format'
-import { Bullets, contactItems, fullName, type TemplateProps } from './parts'
+import {
+  Bullets,
+  RecommendationList,
+  contactItems,
+  fullName,
+  type TemplateProps,
+} from './parts'
 
 export function Classique({ resume, accent }: TemplateProps) {
   const { personal, labels } = resume
@@ -115,6 +121,13 @@ export function Classique({ resume, accent }: TemplateProps) {
               ) : null}
             </article>
           ))}
+        </section>
+      ) : null}
+
+      {resume.recommendations.length > 0 ? (
+        <section style={{ marginTop: '6mm' }}>
+          {heading(labels.recommendations)}
+          <RecommendationList items={resume.recommendations} accent={accent} />
         </section>
       ) : null}
 

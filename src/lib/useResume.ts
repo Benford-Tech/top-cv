@@ -1,10 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Education, Experience, Language, Resume, Settings, Skill } from '../types'
+import type {
+  Education,
+  Experience,
+  Language,
+  Recommendation,
+  Resume,
+  Settings,
+  Skill,
+} from '../types'
 import { EMPTY_RESUME, sampleResume } from '../data/defaults'
 import { loadResume, saveResume } from './storage'
 import { uid } from './id'
 
-export type ListKey = 'experiences' | 'education' | 'skills' | 'languages'
+export type ListKey =
+  | 'experiences'
+  | 'education'
+  | 'skills'
+  | 'languages'
+  | 'recommendations'
 type ItemOf<K extends ListKey> = Resume[K][number]
 
 const BLANK: { [K in ListKey]: () => ItemOf<K> } = {
@@ -29,6 +42,7 @@ const BLANK: { [K in ListKey]: () => ItemOf<K> } = {
   }),
   skills: (): Skill => ({ id: uid(), name: '', level: 3 }),
   languages: (): Language => ({ id: uid(), name: '', level: '' }),
+  recommendations: (): Recommendation => ({ id: uid(), author: '', role: '', text: '' }),
 }
 
 /**
@@ -106,6 +120,59 @@ export function useResume() {
     })
   }, [])
 
+  /**
+   * Applique un import LinkedIn aux seules sections retenues. En mode « ajouter »
+   * les entrées existantes sont conservées : un CV déjà travaillé ne doit pas
+   * être écrasé par une archive.
+   */
+  const applyImport = useCallback(
+    (
+      incoming: Partial<Pick<Resume, ListKey>> & {
+        firstName?: string
+        lastName?: string
+        headline?: string
+        summary?: string
+        city?: string
+        email?: string
+      },
+      keys: ListKey[],
+      mode: 'replace' | 'append',
+    ) => {
+      setResume((prev) => {
+        const next: Resume = { ...prev }
+        for (const key of keys) {
+          const list = incoming[key]
+          if (!list || list.length === 0) continue
+          const merged =
+            mode === 'replace' ? list : [...(prev[key] as unknown[]), ...(list as unknown[])]
+          ;(next as Record<string, unknown>)[key] = merged
+        }
+        // Les champs d'identité ne sont remplis que s'ils sont vides : un import
+        // ne doit jamais écraser ce que l'utilisateur a saisi lui-même.
+        if (incoming.firstName && !prev.personal.firstName) {
+          next.personal = { ...next.personal, firstName: incoming.firstName }
+        }
+        if (incoming.lastName && !prev.personal.lastName) {
+          next.personal = { ...next.personal, lastName: incoming.lastName }
+        }
+        if (incoming.headline && !prev.personal.title) {
+          next.personal = { ...next.personal, title: incoming.headline }
+        }
+        if (incoming.city && !prev.personal.city) {
+          next.personal = { ...next.personal, city: incoming.city }
+        }
+        if (incoming.email && !prev.personal.email) {
+          next.personal = { ...next.personal, email: incoming.email }
+        }
+        if (incoming.summary && !prev.summary.trim()) {
+          next.summary = incoming.summary
+        }
+        return next
+      })
+    },
+    [],
+  )
+
   const reset = useCallback(() => {
     setResume((prev) => ({ ...EMPTY_RESUME, settings: prev.settings }))
   }, [])
@@ -126,6 +193,7 @@ export function useResume() {
     updateItem,
     removeItem,
     moveItem,
+    applyImport,
     reset,
     loadSample,
   }

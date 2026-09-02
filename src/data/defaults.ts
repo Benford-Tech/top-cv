@@ -36,12 +36,14 @@ export const EMPTY_RESUME: Resume = {
   education: [],
   skills: [],
   languages: [],
+  recommendations: [],
   labels: {
     summary: 'Profil',
     experiences: 'Expérience professionnelle',
     education: 'Formation',
     skills: 'Compétences',
     languages: 'Langues',
+    recommendations: 'Recommandations',
   },
   settings: {
     template: 'moderne',
@@ -120,6 +122,14 @@ export function sampleResume(): Resume {
       { id: uid(), name: 'Cadrage fonctionnel', level: 4 },
       { id: uid(), name: 'Figma', level: 4 },
       { id: uid(), name: 'Analyse de données', level: 3 },
+    ],
+    recommendations: [
+      {
+        id: uid(),
+        author: 'Sofia Renard',
+        role: 'Directrice de production, Atelier Nova',
+        text: "Camille a repris un projet en difficulté à mi-parcours et l'a livré dans les délais annoncés. Sa capacité à remettre une équipe en mouvement sans braquer personne est rare.",
+      },
     ],
     languages: [
       { id: uid(), name: 'Français', level: 'Langue maternelle' },

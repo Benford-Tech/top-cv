@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { Personal, Resume } from '../../../types'
+import type { Personal, Recommendation, Resume } from '../../../types'
 import { toBullets } from '../../../lib/format'
 import { Globe, LinkedIn, Mail, Phone, Pin } from '../../ui/icons'
 
@@ -84,4 +84,43 @@ export function LevelBar({ level, accent, muted }: { level: number; accent: stri
 
 export function fullName(personal: Personal): string {
   return [personal.firstName, personal.lastName].filter(Boolean).join(' ')
+}
+
+/**
+ * Recommandations : l'auteur porte l'information, la citation vient l'appuyer.
+ * Sur un CV la place est comptée — le texte reste au format saisi, c'est à
+ * l'éditeur qu'on invite à le raccourcir.
+ */
+export function RecommendationList({
+  items,
+  accent,
+}: {
+  items: Recommendation[]
+  accent: string
+}) {
+  if (items.length === 0) return null
+  return (
+    <>
+      {items.map((item) => (
+        <figure key={item.id} className="avoid-break" style={{ marginBottom: '3.5mm' }}>
+          <blockquote
+            style={{
+              borderLeft: `2px solid ${accent}44`,
+              paddingLeft: '3mm',
+              fontStyle: 'italic',
+              color: '#334155',
+              fontSize: '0.92em',
+              lineHeight: 1.5,
+            }}
+          >
+            {item.text}
+          </blockquote>
+          <figcaption style={{ marginTop: '0.3em', paddingLeft: '3mm', fontSize: '0.85em' }}>
+            <span style={{ fontWeight: 600, color: '#111827' }}>{item.author}</span>
+            {item.role ? <span style={{ color: '#64748b' }}> — {item.role}</span> : null}
+          </figcaption>
+        </figure>
+      ))}
+    </>
+  )
 }
