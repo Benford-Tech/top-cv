@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
-import { sampleResume, ACCENTS } from './data/defaults'
+import { sampleResume, tileResume, ACCENTS } from './data/defaults'
 import { TEMPLATES } from './components/preview/templates'
 import { SUGGESTIONS } from './data/suggestions'
+import { FAQ } from './content/faq'
+import { JOB_PAGES } from './content/jobs'
 import { TemplateShowcase } from './components/landing/TemplateShowcase'
 import { Check, LinkedIn, Lock, Printer, Sparkles } from './components/ui/icons'
 
@@ -12,6 +14,7 @@ import { Check, LinkedIn, Lock, Printer, Sparkles } from './components/ui/icons'
  */
 export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: () => void }) {
   const demo = useMemo(() => sampleResume(), [])
+  const tile = useMemo(() => tileResume(), [])
 
   const steps = [
     {
@@ -65,32 +68,6 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
     },
   ]
 
-  const faq = [
-    {
-      q: 'Combien ça coûte ?',
-      a: 'La rédaction, l’aperçu et l’export de vos données sont gratuits. Seul le téléchargement du PDF est payant : le montant s’affiche au moment de télécharger, une fois votre CV terminé et avant tout engagement.',
-    },
-    {
-      q: 'C’est un abonnement déguisé ?',
-      a: 'Non. Un paiement unique, aucune reconduction, aucune carte conservée pour plus tard. Il n’y a rien à résilier.',
-    },
-    {
-      q: 'Puis-je corriger mon CV après avoir payé ?',
-      a: 'Oui. Le paiement débloque ce CV définitivement : vous le modifiez et le retéléchargez autant de fois que nécessaire, sans repayer.',
-    },
-    {
-      q: 'Mon CV passera-t-il les filtres automatiques ?',
-      a: 'Le PDF contient du vrai texte, pas une image, ce qui est la condition pour être analysé par ces outils. Les modèles gardent une structure simple et des intitulés de sections explicites. Aucun éditeur ne peut garantir le résultat : les critères varient d’un recruteur à l’autre.',
-    },
-    {
-      q: 'Que deviennent mes données ?',
-      a: 'Votre CV est enregistré sur votre compte pour que nos serveurs puissent composer le PDF. Vous pouvez l’exporter en JSON à tout moment, et supprimer votre compte.',
-    },
-    {
-      q: 'Puis-je essayer avant de payer ?',
-      a: 'C’est le principe : vous rédigez votre CV entier, testez les modèles et voyez le rendu A4 exact. Seul le téléchargement du fichier est payant.',
-    },
-  ]
 
   return (
     <div className="min-h-full bg-white">
@@ -213,19 +190,26 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
           <div className="mt-8 flex flex-wrap gap-6">
             {TEMPLATES.map((template, index) => (
               <figure key={template.id} className="w-[200px]">
-                <TemplateShowcase
-                  id={template.id}
-                  resume={{
-                    ...demo,
-                    settings: {
-                      ...demo.settings,
-                      template: template.id,
-                      accent: ACCENTS[index % ACCENTS.length],
-                    },
-                  }}
-                />
+                <a href={`/modeles/${template.id}`} className="block">
+                    <TemplateShowcase
+                    id={template.id}
+                    resume={{
+                      ...tile,
+                      settings: {
+                        ...tile.settings,
+                        template: template.id,
+                        accent: ACCENTS[index % ACCENTS.length],
+                      },
+                    }}
+                  />
+                </a>
                 <figcaption className="mt-2">
-                  <p className="text-sm font-semibold text-slate-900">{template.name}</p>
+                  <a
+                    href={`/modeles/${template.id}`}
+                    className="text-sm font-semibold text-slate-900 hover:text-blue-600 hover:underline"
+                  >
+                    {template.name}
+                  </a>
                   <p className="text-xs leading-snug text-slate-500">{template.description}</p>
                 </figcaption>
               </figure>
@@ -250,11 +234,39 @@ export function Landing({ onStart, onSignIn }: { onStart: () => void; onSignIn: 
         </div>
       </section>
 
+      {/* ---- Fiches métier ---- */}
+      <section className="border-y border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-5 py-16">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+            Que met-on dans un CV, métier par métier
+          </h2>
+          <p className="mt-2 max-w-2xl text-slate-600">
+            Ce qu’un recruteur regarde en premier, les erreurs propres au métier, et les
+            formulations à reprendre en y mettant vos chiffres.
+          </p>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {JOB_PAGES.map((job) => (
+              <li key={job.slug}>
+                <a
+                  href={`/cv/${job.slug}`}
+                  className="block h-full rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm"
+                >
+                  <span className="block text-sm font-semibold text-slate-900">{job.h1}</span>
+                  <span className="mt-1 block text-xs leading-relaxed text-slate-500">
+                    {job.intro.slice(0, 95)}…
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* ---- Questions ---- */}
       <section className="mx-auto max-w-3xl px-5 py-16">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Questions fréquentes</h2>
         <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
-          {faq.map((item) => (
+          {FAQ.map((item) => (
             <details key={item.q} className="group py-4">
               <summary className="cursor-pointer list-none text-sm font-semibold text-slate-900 marker:content-none">
                 <span className="inline-block w-5 text-slate-400 transition group-open:rotate-90">

@@ -61,8 +61,14 @@ saturerait à elle seule.
 
 | Chemin | Contenu |
 | --- | --- |
-| `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, questions fréquentes. |
+| `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, fiches métier, questions fréquentes. |
+| `/cv/<métier>` | 11 fiches : ce que le recruteur regarde, erreurs propres au métier, formulations à reprendre. |
+| `/modeles/<modèle>` | 5 fiches : à qui le modèle convient, quand en préférer un autre, déclinaisons de couleur. |
 | `/editeur` | L'application d'édition du CV. |
+
+`src/routes.ts` est la liste unique des pages indexables : elle sert au rendu
+dans le navigateur, au prérendu et au plan du site. Aucune page ne peut donc
+être publiée sans métadonnées, ni oubliée du sitemap.
 
 Les vignettes de la galerie sont rendues par **les composants du CV eux-mêmes**,
 réduits à l'échelle : un modèle modifié se voit immédiatement sur la page
@@ -89,12 +95,31 @@ aucun aperçu, ce qui coupe le canal le plus naturel pour un outil de CV.
 compilation en mode SSR (`src/entry-static.tsx`), puis `scripts/postbuild.mjs`
 qui :
 
-- écrit la page d'accueil rendue directement dans `dist/index.html` — le
-  fichier livré contient le texte, les titres et les modèles ;
-- y pose titre, description, balises Open Graph et Twitter, et l'URL canonique,
-  en une seule source de vérité ;
+- écrit **un fichier HTML complet par page** (`dist/cv/developpeur.html`, etc.),
+  contenant le texte, les titres et les modèles ;
+- donne à chacune son titre, sa description, son URL canonique et ses balises
+  Open Graph et Twitter, depuis une source unique ;
+- pose les données structurées : `FAQPage` sur l'accueil — les réponses peuvent
+  alors apparaître directement dans les résultats — et `BreadcrumbList` sur les
+  pages de contenu. Le schéma de l'application est déclaré **sans bloc
+  tarifaire** : le prix n'étant annoncé qu'après rédaction, il n'a pas à
+  s'afficher dans les résultats de recherche ;
 - génère `robots.txt` (l'éditeur et `/api` sont exclus de l'indexation : ce sont
-  des applications, pas des pages) et `sitemap.xml`.
+  des applications, pas des pages), `sitemap.xml` et `404.html`.
+
+Deux pièges évités, qui coûtent cher en référencement :
+
+- **Les fichiers sont plats** (`cv/developpeur.html`), pas des dossiers avec un
+  index. Sinon `/x` et `/x/` répondent tous les deux et chaque page compte
+  double.
+- **La réécriture ne vise que `/editeur`.** Une règle attrape-tout renverrait
+  l'accueil pour n'importe quelle adresse : ces « fausses 404 » sont détectées
+  et sanctionnées. Une adresse inconnue doit répondre 404.
+
+Les vignettes réduites affichent une version courte du CV de démonstration
+(`tileResume`). À 150 px de large le texte n'est pas lisible de toute façon, et
+l'afficher en entier répéterait les mêmes centaines de mots sur chaque page,
+noyant le contenu propre à chacune.
 
 Au chargement, React **hydrate** ce contenu au lieu de le reconstruire : rien ne
 clignote. Les autres chemins reçoivent le même fichier par la réécriture Vercel

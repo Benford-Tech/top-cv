@@ -1,14 +1,21 @@
 import { renderToString } from 'react-dom/server'
-import { Landing } from './Landing'
+import { renderForPath } from './AppRoutes'
 
 /**
- * Rendu de la page d'accueil à la compilation.
+ * Rendu des pages publiques à la compilation.
  *
- * Sans cela, le HTML livré est une coquille vide : les robots des réseaux
+ * Sans cela, le HTML livré serait une coquille vide : les robots des réseaux
  * sociaux — LinkedIn, WhatsApp, Facebook, Slack — n'exécutent pas JavaScript et
- * ne voient donc rien à partager. Le contenu est ici figé dans le fichier, et
- * React reprend la main par hydratation au chargement.
+ * ne verraient rien à partager, et un moteur de recherche doit alors exécuter
+ * le script pour découvrir le contenu, ce qu'il fait plus tard et moins
+ * fiablement. Le contenu est ici figé dans le fichier ; React reprend la main
+ * par hydratation au chargement.
  */
-export function renderLanding(): string {
-  return renderToString(<Landing onStart={() => undefined} onSignIn={() => undefined} />)
+export function renderRoute(path: string): string {
+  return renderToString(
+    renderForPath(path, { onStart: () => undefined, onSignIn: () => undefined }),
+  )
 }
+
+export { ROUTES, SITE_TITLE, SITE_DESCRIPTION } from './routes'
+export { FAQ } from './content/faq'

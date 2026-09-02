@@ -138,3 +138,26 @@ export function sampleResume(): Resume {
     ],
   }
 }
+
+/**
+ * Version courte du CV de démonstration, pour les vignettes réduites.
+ *
+ * À 150 px de large le texte n'est de toute façon pas lisible ; l'afficher en
+ * entier ne servirait qu'à répéter les mêmes centaines de mots sur chaque page
+ * du site, ce qui noierait le contenu propre à chacune aux yeux des moteurs.
+ */
+export function tileResume(): Resume {
+  const full = sampleResume()
+  return {
+    ...full,
+    summary: full.summary.slice(0, 120),
+    experiences: full.experiences.slice(0, 1).map((item) => ({
+      ...item,
+      description: item.description.split('\n').slice(0, 2).join('\n'),
+    })),
+    education: full.education.slice(0, 1),
+    skills: full.skills.slice(0, 3),
+    languages: full.languages.slice(0, 2),
+    recommendations: [],
+  }
+}

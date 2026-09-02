@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import App from './App'
-import { Landing } from './Landing'
+import { renderForPath } from './AppRoutes'
+import { matchRoute } from './routes'
 
 const EDITOR_PATH = '/editeur'
 
 /**
- * Aiguillage minimal entre la page d'accueil et l'éditeur. Deux vues seulement :
- * une bibliothèque de routage complète coûterait plus qu'elle ne rapporte ici.
- * `vercel.json` renvoie les chemins inconnus vers index.html, ce qui rend
- * /editeur partageable et rechargeable.
+ * Aiguillage entre les pages publiques et l'éditeur.
+ *
+ * Les liens entre pages de contenu sont de vrais liens : chaque adresse
+ * correspond à un fichier HTML complet produit à la compilation, une navigation
+ * classique sert donc immédiatement la bonne page. Seul le passage à l'éditeur
+ * se fait sans rechargement, pour ne pas perdre l'état de saisie.
  */
 export function Root() {
   const [path, setPath] = useState(() => window.location.pathname)
@@ -27,9 +30,12 @@ export function Root() {
     window.scrollTo(0, 0)
   }, [])
 
-  if (path.startsWith(EDITOR_PATH)) {
+  if (matchRoute(path).kind === 'editor') {
     return <App initialAuthOpen={openAuth} />
   }
 
-  return <Landing onStart={() => goToEditor(false)} onSignIn={() => goToEditor(true)} />
+  return renderForPath(path, {
+    onStart: () => goToEditor(false),
+    onSignIn: () => goToEditor(true),
+  })
 }

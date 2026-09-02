@@ -16,9 +16,12 @@ const tree = (
  * Les autres chemins reçoivent ce même HTML par la réécriture Vercel, mais
  * doivent rendre autre chose : on repart alors d'un conteneur vide.
  */
-const isLanding = window.location.pathname === '/' || window.location.pathname === ''
+// Toutes les pages publiques sont écrites dans le fichier à la compilation :
+// elles s'hydratent. Seul l'éditeur, qui reçoit le HTML d'une autre page par la
+// réécriture, doit repartir d'un conteneur vide.
+const isPrerendered = !window.location.pathname.startsWith('/editeur')
 
-if (isLanding && container.firstChild) {
+if (isPrerendered && container.firstChild) {
   hydrateRoot(container, tree)
 } else {
   container.innerHTML = ''

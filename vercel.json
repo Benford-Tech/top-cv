@@ -16,7 +16,11 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/editeur",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/editeur/(.*)",
       "destination": "/index.html"
     }
   ]
