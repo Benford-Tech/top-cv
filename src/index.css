@@ -93,64 +93,39 @@ body {
   color: #9aa5b5;
 }
 
-/* ---- Impression ------------------------------------------------------ */
+/* ---- Impression neutralisée -------------------------------------------- */
 
+/*
+ * Le PDF ne se fabrique plus dans le navigateur : il est rendu par le serveur
+ * et remis après paiement. Imprimer la page doit donc ne rien donner, sans quoi
+ * Ctrl+P suffirait à contourner le paiement — la feuille de style d'impression
+ * précédente y aidait même activement.
+ */
 @media print {
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  body {
-    background: #fff;
-  }
-
-  .no-print {
+  body > * {
     display: none !important;
   }
 
-  .app-shell {
-    display: block !important;
-    height: auto !important;
-    overflow: visible !important;
+  body::after {
+    content: 'Le CV se télécharge depuis le bouton « Télécharger le PDF », après paiement.';
+    display: block;
+    padding: 60mm 20mm;
+    text-align: center;
+    font: 12pt/1.6 system-ui, sans-serif;
+    color: #0f172a;
   }
+}
 
-  /* À l'impression la page fait ~794 px de large : les classes responsives
-     masqueraient l'aperçu, qui est pourtant le seul contenu à imprimer. */
-  .preview-pane {
-    display: block !important;
-    width: 100% !important;
-  }
+/* ---- Filigrane de l'aperçu --------------------------------------------- */
 
-  .preview-pane,
-  .preview-scroll {
-    overflow: visible !important;
-    padding: 0 !important;
-    background: #fff !important;
-    height: auto !important;
-  }
-
-  /* L'aperçu est réduit à l'écran pour tenir dans le panneau ; à l'impression
-     la feuille doit retrouver sa taille réelle. */
-  .preview-scaler {
-    transform: none !important;
-    width: auto !important;
-    height: auto !important;
-    margin: 0 !important;
-  }
-
-  /* La réduction d'affichage est portée par la feuille elle-même (style inline) :
-     sans ce reset le PDF sortirait à ~95 % du format A4. */
-  .resume-page {
-    transform: none !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    /* Hauteur de page pleine : les modèles à bandeau latéral doivent colorer
-       jusqu'en bas, même quand le contenu s'arrête plus haut. */
-    min-height: 297mm !important;
-  }
-
-  .page-break-guide {
-    display: none !important;
-  }
+/*
+ * Rappelle que l'aperçu n'est pas le livrable. Il disparaît une fois le CV
+ * débloqué. Ce n'est pas une protection cryptographique — le texte reste dans
+ * la page — mais le document propre, lui, n'existe que sur le serveur.
+ */
+.preview-watermark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='170'%3E%3Ctext x='16' y='104' transform='rotate(-28 130 85)' fill='%230f172a' fill-opacity='0.10' font-family='Helvetica,Arial,sans-serif' font-size='30' font-weight='700'%3EAPER%C3%87U%3C/text%3E%3C/svg%3E");
 }

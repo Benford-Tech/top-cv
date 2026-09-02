@@ -11,9 +11,13 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^149.0.0",
+    "@supabase/supabase-js": "^2.112.4",
     "fflate": "^0.8.3",
+    "puppeteer-core": "^25.9.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "stripe": "^22.6.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.13",

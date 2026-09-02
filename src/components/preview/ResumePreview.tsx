@@ -8,9 +8,12 @@ const A4_RATIO = 297 / 210
 export function ResumePreview({
   resume,
   onPageCount,
+  watermark = false,
 }: {
   resume: Resume
   onPageCount?: (count: number) => void
+  /** Rappelle que l'aperçu n'est pas le livrable tant que le CV n'est pas payé. */
+  watermark?: boolean
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
@@ -72,6 +75,8 @@ export function ResumePreview({
           }}
         >
           <Component resume={resume} accent={resume.settings.accent} />
+
+          {watermark ? <div className="preview-watermark" aria-hidden="true" /> : null}
 
           {Array.from({ length: pageCount - 1 }, (_, index) => (
             <div

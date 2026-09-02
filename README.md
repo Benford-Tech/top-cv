@@ -57,6 +57,68 @@ Des repères en pointillés matérialisent les changements de page.
 `localStorage` est de quelques mégaoctets, une photo brute d'appareil le
 saturerait à elle seule.
 
+## Comptes, paiement et téléchargement
+
+Le CV se rédige librement, mais **le PDF ne s'obtient qu'avec un compte et
+après paiement**, à l'unité : un règlement débloque définitivement ce CV, y
+compris après modification.
+
+### Pourquoi le PDF est fabriqué par le serveur
+
+Tant que le PDF était produit par l'impression du navigateur, **il n'y avait
+rien à protéger** : `Ctrl+P` donnait le document sans passer par le moindre
+bouton, et la feuille de style d'impression du projet y aidait activement.
+Masquer un bouton n'est pas un verrou.
+
+Le document est donc désormais rendu par `api/cv/pdf.ts` : Chromium sans
+interface compose le PDF à partir des données stockées en base, et l'endpoint ne
+le remet qu'à un utilisateur authentifié dont le CV est marqué payé. Les mêmes
+composants React servent à l'aperçu et au PDF — un seul jeu de modèles à
+maintenir, et aucun écart possible entre ce qui est vu et ce qui est vendu.
+
+En conséquence, dans le navigateur :
+
+- l'impression de la page est neutralisée : elle ne rend qu'une ligne renvoyant
+  vers le bouton de téléchargement ;
+- l'aperçu porte un filigrane tant que le CV n'est pas débloqué ;
+- l'export JSON demande d'être connecté. Il est **volontairement conservé** :
+  ce sont les données de l'utilisateur, pas un CV mis en page, et le droit à la
+  portabilité des données (RGPD, article 20) s'y oppose.
+
+> **Ce qui n'est pas bloqué, et ne peut pas l'être.** Le texte de l'aperçu reste
+> dans la page : une capture d'écran ou un copier-coller restent possibles. Ce
+> qui est garanti, c'est que le **document propre, paginé, en pleine qualité**
+> n'existe que sur le serveur et n'est remis qu'après paiement. Un aperçu
+> réellement inviolable supposerait de n'envoyer au navigateur qu'une image
+> dégradée, au prix d'un éditeur temps réel — le compromis retenu est celui des
+> produits du marché.
+
+### Où se joue le droit de télécharger
+
+Trois verrous, du plus externe au plus interne :
+
+1. **La signature du webhook.** `api/stripe-webhook.ts` est le seul chemin qui
+   passe `paid` à `true`. Il rejette toute requête dont la signature Stripe
+   n'est pas valide : appeler l'URL à la main ne donne rien.
+2. **Les privilèges de colonnes.** La base retire au rôle `authenticated`
+   l'écriture sur `paid`, `paid_at` et `stripe_session_id` (`grant update
+   (title, data)`). Même en forgeant une requête, un utilisateur connecté ne
+   peut pas s'accorder le droit de télécharger. Les politiques RLS seules ne le
+   permettraient pas : elles ne savent pas restreindre colonne par colonne.
+3. **RLS.** Un identifiant de CV volé ne sert à rien : les politiques limitent
+   chaque lecture et écriture au propriétaire.
+
+### Mise en place
+
+1. Créer un projet Supabase, exécuter `supabase/schema.sql` dans son éditeur SQL.
+2. Renseigner les variables de `.env.example` dans Vercel.
+3. Déclarer le webhook Stripe vers `https://votre-domaine/api/stripe-webhook`,
+   événement `checkout.session.completed`, et reporter son secret de signature
+   dans `STRIPE_WEBHOOK_SECRET`.
+
+Sans ces variables, l'application reste utilisable comme brouillon local et
+annonce clairement que le téléchargement n'est pas disponible.
+
 ## Import LinkedIn
 
 L'application peut préremplir un CV depuis LinkedIn : expériences, formations,
@@ -180,6 +242,15 @@ src/
   lib/linkedinProfile.ts      normalisation de la réponse d'un fournisseur
 api/
   linkedin.ts                 relais serveur vers le fournisseur de données
+  resumes.ts                  CV de l'utilisateur (liste, création, mise à jour)
+  checkout.ts                 ouverture d'une session de paiement Stripe
+  stripe-webhook.ts           seul chemin accordant le droit de télécharger
+  cv/pdf.ts                   fabrication du PDF, après vérification du paiement
+  _lib/renderResume.tsx       rendu serveur du CV en HTML
+  _lib/pdf.ts                 HTML vers PDF via Chromium
+  _lib/auth.ts                vérification du jeton et clients Supabase
+supabase/
+  schema.sql                  tables, RLS et privilèges de colonnes
   components/Toolbar.tsx      barre d'actions (export, import, PDF)
   components/editor/          formulaires, sélecteur de phrases, import LinkedIn,
                               panneau de style

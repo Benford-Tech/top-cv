@@ -84,6 +84,12 @@ export const Close = (p: IconProps) => (
     <path d="M6 6l12 12M18 6 6 18" />
   </Svg>
 )
+export const Lock = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4" y="10" width="16" height="10" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+  </Svg>
+)
 export const Mail = (p: IconProps) => (
   <Svg {...p}>
     <path d="M3 6h18v12H3z" />
