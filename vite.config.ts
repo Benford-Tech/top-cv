@@ -4,5 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './',
+  // Base absolue : l'application sert désormais plusieurs chemins (/, /editeur),
+  // et des URL d'assets relatives se résoudraient mal sur les routes profondes.
+  base: '/',
 })

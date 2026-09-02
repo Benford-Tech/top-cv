@@ -12,7 +12,7 @@ import { ResumePreview } from './components/preview/ResumePreview'
 
 type Tab = 'contenu' | 'design'
 
-export default function App() {
+export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boolean }) {
   const store = useResume()
   const { resume, setResume, updateSettings, reset, loadSample } = store
   const auth = useAuth()
@@ -21,7 +21,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('contenu')
   const [pageCount, setPageCount] = useState(1)
   const [mobileView, setMobileView] = useState<'editeur' | 'apercu'>('editeur')
-  const [authOpen, setAuthOpen] = useState(false)
+  const [authOpen, setAuthOpen] = useState(initialAuthOpen)
   const [authReason, setAuthReason] = useState<string | undefined>()
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)

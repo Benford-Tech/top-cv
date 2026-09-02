@@ -57,6 +57,27 @@ Des repères en pointillés matérialisent les changements de page.
 `localStorage` est de quelques mégaoctets, une photo brute d'appareil le
 saturerait à elle seule.
 
+## Pages
+
+| Chemin | Contenu |
+| --- | --- |
+| `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, tarif, questions fréquentes. |
+| `/editeur` | L'application d'édition du CV. |
+
+Les vignettes de la galerie sont rendues par **les composants du CV eux-mêmes**,
+réduits à l'échelle : un modèle modifié se voit immédiatement sur la page
+d'accueil, et une vignette ne peut pas promettre autre chose que le produit.
+
+L'aiguillage tient en une trentaine de lignes (`src/Root.tsx`) — deux vues ne
+justifient pas une bibliothèque de routage. `vercel.json` renvoie les chemins
+inconnus vers `index.html` en excluant `/api`, pour que `/editeur` reste
+partageable et rechargeable.
+
+> La page d'accueil ne comporte **ni témoignages, ni logos d'entreprises, ni
+> compteur d'utilisateurs**. Le produit n'a pas encore d'utilisateurs : ces
+> éléments seraient fabriqués. À ajouter quand ils existeront et seront
+> vérifiables.
+
 ## Comptes, paiement et téléchargement
 
 Le CV se rédige librement, mais **le PDF ne s'obtient qu'avec un compte et
