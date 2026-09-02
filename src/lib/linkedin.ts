@@ -235,11 +235,21 @@ export function isEmptyImport(data: LinkedInImport): boolean {
 }
 
 /**
- * Accepte l'archive ZIP telle que LinkedIn la livre, ou les CSV isolés qu'on
- * en aurait extraits — les deux gestes sont naturels selon le navigateur.
+ * Accepte les trois fichiers gratuits que LinkedIn remet à ses membres :
+ * l'archive ZIP d'export, les CSV qu'on en aurait extraits, ou le PDF produit
+ * par « Enregistrer au format PDF » depuis un profil.
  */
 export async function readLinkedInExport(fileList: File[]): Promise<LinkedInImport> {
   const contents: Record<string, string> = {}
+
+  // Le PDF « Enregistrer au format PDF » suit une tout autre structure : il est
+  // traité par son propre lecteur, chargé à la demande pour ne pas alourdir le
+  // bundle de ceux qui déposent une archive.
+  const pdf = fileList.find((file) => file.name.toLowerCase().endsWith('.pdf'))
+  if (pdf) {
+    const { readLinkedInPdf } = await import('./linkedinPdf')
+    return readLinkedInPdf(pdf)
+  }
 
   for (const file of fileList) {
     if (file.name.toLowerCase().endsWith('.zip')) {

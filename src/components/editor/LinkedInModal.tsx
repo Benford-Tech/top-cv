@@ -123,9 +123,9 @@ export function LinkedInModal({
           <div className="flex-1">
             <h2 className="text-base font-semibold text-slate-900">Importer depuis LinkedIn</h2>
             <p className="mt-0.5 text-xs text-slate-500">
-              Par l’adresse du profil, si un fournisseur de données est configuré — ou par
-              l’archive d’export, qui ne dépend de personne et contient toujours les
-              recommandations.
+              Deux fichiers gratuits que LinkedIn remet à ses membres suffisent : le PDF de
+              votre profil, immédiat, ou l’archive de données, plus complète. Aucun compte tiers
+              n’est nécessaire.
             </p>
           </div>
           <button
@@ -169,7 +169,26 @@ export function LinkedInModal({
             <span className="h-px flex-1 bg-slate-200" />
           </div>
 
-          <p className="text-xs font-semibold text-slate-800">Par l’archive d’export</p>
+          <p className="text-xs font-semibold text-slate-800">
+            Par un fichier que LinkedIn vous donne — gratuit
+          </p>
+
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 text-xs text-emerald-900">
+            <p className="font-semibold">Le plus rapide : le PDF de votre profil</p>
+            <p className="mt-1 leading-relaxed">
+              Sur votre profil LinkedIn, bouton <em>Ressources</em> (ou <em>Plus</em>) →{' '}
+              <em>Enregistrer au format PDF</em>. Le fichier arrive tout de suite. Il contient
+              expériences, formations et compétences, mais pas les recommandations.
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+            <p className="font-semibold text-slate-800">Le plus complet : l’archive de données</p>
+            <p className="mt-1">
+              Seule voie qui contient aussi les recommandations reçues, mais LinkedIn met parfois
+              jusqu’à 24 h à l’envoyer.
+            </p>
+          </div>
 
           <ol className="space-y-1.5 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
             <li>
@@ -190,14 +209,14 @@ export function LinkedInModal({
           <input
             ref={input}
             type="file"
-            accept=".zip,.csv"
+            accept=".pdf,.zip,.csv"
             multiple
             className="hidden"
             onChange={(event) => void handleFiles(event.target.files)}
           />
           <Button variant="ghost" onClick={() => input.current?.click()} disabled={busy}>
             <Upload className="h-4 w-4" />
-            {busy ? 'Lecture…' : 'Choisir l’archive ZIP ou des fichiers CSV'}
+            {busy ? 'Lecture…' : 'Choisir le PDF, l’archive ZIP ou des fichiers CSV'}
           </Button>
 
           {error ? (

@@ -273,6 +273,26 @@ seulement : ni la clé ni les détails d'infrastructure ne remontent au navigate
 - chaque recherche est facturée, et la disponibilité dépend d'un acteur externe ;
 - les recommandations ne sont pas restituées par tous les fournisseurs.
 
+### Par un fichier que LinkedIn vous donne — gratuit, sans prestataire
+
+Deux fichiers, avec un arbitrage clair entre rapidité et complétude :
+
+| Fichier | Délai | Contenu |
+| --- | --- | --- |
+| **PDF du profil** — sur votre profil, *Ressources* (ou *Plus*) → *Enregistrer au format PDF* | immédiat | expériences, formations, compétences, langues — **pas les recommandations** |
+| **Archive de données** — *Confidentialité des données → Obtenir une copie de vos données* | quelques minutes à 24 h | tout, **recommandations reçues comprises** |
+
+Les deux sont lus **dans le navigateur**, rien n'est envoyé nulle part, et aucun
+compte tiers n'est nécessaire.
+
+Le PDF n'est pas un format documenté : son analyse (`src/lib/linkedinPdf.ts`)
+est heuristique. Les lignes de dates servent d'ancres — chaque entrée du profil
+suit la disposition « entreprise / poste / dates / lieu / description » — et
+l'écran d'import affiche le décompte de ce qui a été reconnu, section par
+section, pour qu'un document atypique se voie plutôt que d'être avalé en
+silence. `pdfjs-dist` est chargé à la demande : il ne pèse sur le bundle que
+lorsqu'un PDF est effectivement déposé.
+
 ### Par l'archive d'export
 
 Sans dépendance externe, et c'est la seule voie qui garantit les
