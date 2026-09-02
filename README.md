@@ -29,7 +29,7 @@ déposé tel quel sur n'importe quel hébergement de fichiers.
   typographiques, curseur de densité, affichage optionnel de la photo et des
   niveaux de compétence.
 - **Suggestions de contenu** — une bibliothèque de formulations rangées par
-  métier (11 familles) pour la phrase d'accroche et les descriptions de poste.
+  métier (21 familles) pour la phrase d'accroche et les descriptions de poste.
   Les repères chiffrés sont laissés en « X » à remplacer : c'est le chiffre qui
   fait la différence sur un CV.
 - **Export PDF** au format A4, plus export / import JSON pour reprendre un CV
@@ -62,7 +62,7 @@ saturerait à elle seule.
 | Chemin | Contenu |
 | --- | --- |
 | `/` | Page d'accueil publique : promesse, étapes, galerie des modèles, fiches métier, questions fréquentes. |
-| `/cv/<métier>` | 11 fiches : ce que le recruteur regarde, erreurs propres au métier, formulations à reprendre. |
+| `/cv/<métier>` | 21 fiches : ce que le recruteur regarde, erreurs propres au métier, formulations à reprendre. |
 | `/modeles/<modèle>` | 5 fiches : à qui le modèle convient, quand en préférer un autre, déclinaisons de couleur. |
 | `/editeur` | L'application d'édition du CV. |
 

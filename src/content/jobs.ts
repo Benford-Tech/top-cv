@@ -379,6 +379,326 @@ export const JOB_PAGES: JobPage[] = [
     templateWhy:
       "Une présentation dépouillée qui laisse respirer un parcours composé de nombreux postes et saisons.",
   },
+  {
+    slug: 'assistant-administratif',
+    suggestionId: 'assistant',
+    metaTitle: 'Exemple de CV assistant administratif et de direction',
+    metaDescription:
+      'CV assistant administratif ou de direction : périmètre réel, outils maîtrisés, discrétion. Formulations d’exemple et modèle à remplir en ligne.',
+    h1: 'CV d’assistant : le périmètre plutôt que les tâches',
+    intro:
+      "« Assistant » est l'un des intitulés les plus larges du marché : il va de la saisie de commandes à l'assistanat d'un comité de direction. Une liste de tâches ne dit rien de ce niveau. Ce qui le dit, c'est le nombre de personnes servies, la nature des dossiers confiés et le degré d'autonomie laissé.",
+    priorities: [
+      {
+        title: 'Qui vous assistez, et combien',
+        body: "Un dirigeant, un service de quinze personnes, trois associés : ce chiffre situe immédiatement la charge. Précisez aussi le niveau hiérarchique, car assister un comité de direction suppose une exposition différente.",
+      },
+      {
+        title: 'Ce que vous traitez sans qu’on vous le demande',
+        body: "L'autonomie est la vraie compétence du métier. Arbitrer un agenda, préparer un dossier avant qu'il ne soit réclamé, relancer un fournisseur de sa propre initiative : dites-le, c'est ce qui sépare un assistant d'un exécutant.",
+      },
+      {
+        title: 'Les outils, précisément',
+        body: "Suite bureautique, outil de gestion, logiciel de notes de frais, plateforme de réservation de déplacements. Votre niveau réel sur tableur est souvent testé : ne le surévaluez pas.",
+      },
+    ],
+    mistakes: [
+      "Aligner des verbes d'action sans jamais dire pour combien de personnes ni sur quels sujets.",
+      "Passer sous silence la gestion de l'information confidentielle, qui est pourtant au cœur du poste.",
+      "Négliger la présentation du CV : dans un métier d'organisation, un document mal aligné est un contre-argument.",
+    ],
+    template: 'classique',
+    templateWhy:
+      "Une mise en page sobre et impeccablement alignée : le document devient lui-même une démonstration de rigueur.",
+  },
+  {
+    slug: 'vendeur',
+    suggestionId: 'vente',
+    metaTitle: 'Exemple de CV vendeur en magasin : chiffres et rayon',
+    metaDescription:
+      'CV vendeur ou conseiller de vente : type d’enseigne, panier moyen, chiffre d’affaires personnel, tenue de caisse. Exemples et modèle à remplir.',
+    h1: 'CV de vendeur : l’enseigne en dit long',
+    intro:
+      "Vendre du prêt-à-porter à quinze euros la pièce et du mobilier à trois mille n'est pas le même métier : ni le même rythme, ni le même conseil, ni le même client. Le responsable de magasin qui lit votre CV cherche d'abord à situer les enseignes que vous avez connues.",
+    priorities: [
+      {
+        title: 'Le type d’enseigne et la surface',
+        body: "Grande surface spécialisée, boutique de centre-ville, corner en grand magasin : nommez-les, avec la surface et le nombre de références quand vous les connaissez.",
+      },
+      {
+        title: 'Votre chiffre, pas celui du magasin',
+        body: "Chiffre d'affaires personnel, panier moyen, taux de transformation, ventes additionnelles : ces indicateurs existent dans votre outil de caisse et presque personne ne les reprend.",
+      },
+      {
+        title: 'Ce que vous faites hors vente',
+        body: "Réassort, marchandisage, inventaire, ouverture et fermeture, tenue de caisse : ces responsabilités montrent qu'on vous laisse le magasin, ce qui pèse lourd à l'embauche.",
+      },
+    ],
+    mistakes: [
+      "Écrire « accueil et conseil client » sans un chiffre : c'est la ligne que tous les candidats écrivent.",
+      "Présenter les contrats saisonniers comme un parcours instable alors que c'est le fonctionnement normal du commerce.",
+      "Omettre les langues parlées, décisives dans les zones touristiques et les grands magasins.",
+    ],
+    template: 'moderne',
+    templateWhy:
+      "Une lecture rapide et des jauges pour les langues et les outils de caisse, que les responsables de magasin repèrent d'un coup d'œil.",
+  },
+  {
+    slug: 'aide-soignant',
+    suggestionId: 'aidesoignant',
+    metaTitle: 'Exemple de CV aide-soignant : structures, gestes et diplôme',
+    metaDescription:
+      'CV aide-soignant : type de structure, nombre de résidents, gestes pratiqués, diplôme d’État. Formulations d’exemple et modèle à remplir.',
+    h1: 'CV d’aide-soignant : la structure change tout',
+    intro:
+      "Un établissement pour personnes âgées dépendantes, un service de soins de suite et un domicile n'imposent ni le même rythme, ni la même relation, ni la même charge physique. C'est la première information qu'un cadre de santé cherche, avant même le diplôme.",
+    priorities: [
+      {
+        title: 'Le type de structure et sa taille',
+        body: "Nombre de résidents ou de lits, présence d'une unité protégée, ratio de personnel. Un aide-soignant qui a tenu un étage de trente résidents en sous-effectif le sait, et le recruteur aussi.",
+      },
+      {
+        title: 'Le diplôme et sa date',
+        body: "Le diplôme d'État est vérifié systématiquement. Indiquez-le en haut de page, avec l'établissement et l'année, ainsi que les formations obligatoires à jour.",
+      },
+      {
+        title: 'Les gestes et le matériel',
+        body: "Transferts avec lève-personne, soins de nursing, prise de constantes, accompagnement de fin de vie : ces mentions permettent d'évaluer votre autonomie dès la première vacation.",
+      },
+    ],
+    mistakes: [
+      "Rester dans le vocabulaire du « bien-être des résidents » sans jamais indiquer combien vous en accompagniez.",
+      "Cacher les remplacements et l'intérim, qui prouvent au contraire une capacité d'adaptation rapide très recherchée.",
+      "Oublier de préciser les disponibilités — nuits, week-ends, jours fériés — qui conditionnent souvent le recrutement.",
+    ],
+    template: 'classique',
+    templateWhy:
+      "Une structure nette, sans effet graphique, adaptée aux services où l'on trie beaucoup de candidatures rapidement.",
+  },
+  {
+    slug: 'auxiliaire-de-vie',
+    suggestionId: 'domicile',
+    metaTitle: 'Exemple de CV auxiliaire de vie et aide à domicile',
+    metaDescription:
+      'CV auxiliaire de vie : publics accompagnés, autonomie au domicile, permis et mobilité. Exemples de formulations et modèle à remplir.',
+    h1: 'CV d’auxiliaire de vie : seul chez les gens',
+    intro:
+      "C'est un métier qui s'exerce sans collègue dans la pièce d'à côté. Le responsable de secteur cherche donc quelqu'un de fiable autant que de compétent : votre CV doit démontrer les deux, et la régularité y compte autant que les gestes techniques.",
+    priorities: [
+      {
+        title: 'Les publics accompagnés',
+        body: "Personnes âgées dépendantes, personnes en situation de handicap, enfants, fins de vie : chaque public demande une posture différente. Précisez aussi les pathologies fréquentes rencontrées.",
+      },
+      {
+        title: 'Le permis et la mobilité',
+        body: "Dans ce métier, le permis et le véhicule personnel ne sont pas un détail : ils conditionnent l'accès aux postes en zone rurale et périurbaine. Indiquez-les de façon visible.",
+      },
+      {
+        title: 'La durée des missions',
+        body: "Rester deux ans chez la même personne prouve une relation de confiance installée. C'est un signal fort dans un secteur marqué par un fort renouvellement.",
+      },
+    ],
+    mistakes: [
+      "Ne parler que de tâches ménagères alors que le cœur du métier est l'accompagnement de la personne.",
+      "Oublier de mentionner le diplôme d'État d'accompagnant éducatif et social ou les formations suivies.",
+      "Négliger les situations difficiles gérées — chute, désorientation, refus de soin — qui démontrent le sang-froid.",
+    ],
+    template: 'minimal',
+    templateWhy:
+      "Une présentation dépouillée qui met en avant la durée des missions, souvent l'argument le plus convaincant.",
+  },
+  {
+    slug: 'conducteur-de-travaux',
+    suggestionId: 'btp',
+    metaTitle: 'Exemple de CV conducteur de travaux : chantiers et budgets',
+    metaDescription:
+      'CV conducteur de travaux ou chef de chantier : montants pilotés, corps d’état coordonnés, sécurité. Formulations d’exemple et modèle à remplir.',
+    h1: 'CV de conducteur de travaux : le chantier fait le CV',
+    intro:
+      "Dans le bâtiment, on vous juge sur ce que vous avez construit. Le montant du chantier, sa nature et le nombre d'entreprises coordonnées valent tous les adjectifs : ce sont les seules données qui permettent à un directeur de travaux de savoir s'il peut vous confier le sien.",
+    priorities: [
+      {
+        title: 'Le montant et la nature des chantiers',
+        body: "Logement collectif, tertiaire, industriel, réhabilitation en site occupé : chaque famille a ses contraintes. Donnez le montant et la durée de vos trois chantiers les plus significatifs.",
+      },
+      {
+        title: 'Les corps d’état coordonnés',
+        body: "Tous corps d'état ou lot unique, nombre de sous-traitants, présence d'un maître d'œuvre exigeant : c'est ce qui mesure votre capacité de coordination réelle.",
+      },
+      {
+        title: 'La sécurité, chiffrée',
+        body: "Taux de fréquence, nombre de mois sans accident avec arrêt, actions de prévention menées. Dans un secteur où la sécurité est un enjeu majeur, ces chiffres pèsent.",
+      },
+    ],
+    mistakes: [
+      "Énumérer les employeurs sans jamais donner un montant de chantier, ce qui empêche toute comparaison.",
+      "Taire les chantiers difficiles : un dossier redressé démontre plus qu'une série d'opérations sans accroc.",
+      "Oublier les logiciels de suivi et de chiffrage, devenus des critères de tri courants.",
+    ],
+    template: 'colonne',
+    templateWhy:
+      "La colonne latérale accueille certifications, habilitations et logiciels, laissant toute la place au récit des chantiers.",
+  },
+  {
+    slug: 'technicien-de-maintenance',
+    suggestionId: 'maintenance',
+    metaTitle: 'Exemple de CV technicien de maintenance industrielle',
+    metaDescription:
+      'CV technicien de maintenance : parc d’équipements, temps d’arrêt, habilitations, préventif et curatif. Exemples de formulations et modèle à remplir.',
+    h1: 'CV de technicien de maintenance : ce que vous savez remettre en route',
+    intro:
+      "Un responsable maintenance recrute pour un parc machine précis. Il cherche donc, ligne après ligne, les technologies que vous avez déjà démontées : marques d'automates, types de variateurs, familles d'équipements. Les compétences décrites en termes généraux ne lui apprennent rien.",
+    priorities: [
+      {
+        title: 'Le parc et le secteur',
+        body: "Agroalimentaire, plasturgie, automobile, pharmacie : chaque secteur a ses cadences et ses contraintes d'hygiène ou de traçabilité. Indiquez le nombre d'équipements et de lignes suivies.",
+      },
+      {
+        title: 'Préventif ou curatif, et dans quelle proportion',
+        body: "Un technicien qui fait surtout du dépannage en urgence et un autre qui construit un plan de maintenance préventive n'ont pas le même profil. Dites où vous vous situez, et ce que vous avez amélioré.",
+      },
+      {
+        title: 'Les habilitations',
+        body: "Électriques, travail en hauteur, conduite d'engins, consignation : elles conditionnent l'accès au poste et leur date de validité est vérifiée. Faites-les figurer clairement.",
+      },
+    ],
+    mistakes: [
+      "Écrire « maintenance industrielle » sans nommer une seule marque d'équipement ou d'automate.",
+      "Omettre les indicateurs — taux de disponibilité, temps moyen de réparation — alors qu'ils existent dans votre outil de gestion.",
+      "Négliger les astreintes et le travail posté, qui font partie du poste et rassurent quand ils sont assumés.",
+    ],
+    template: 'moderne',
+    templateWhy:
+      "Une colonne unique où les technologies restent lisibles telles quelles par les outils de tri, qui cherchent des noms exacts.",
+  },
+  {
+    slug: 'chauffeur-livreur',
+    suggestionId: 'transport',
+    metaTitle: 'Exemple de CV chauffeur-livreur : permis, tournées, sinistralité',
+    metaDescription:
+      'CV chauffeur-livreur : permis et cartes, type de véhicule, nombre de points de livraison, dossier de conduite. Exemples et modèle à remplir.',
+    h1: 'CV de chauffeur-livreur : permis d’abord',
+    intro:
+      "C'est le métier où le CV se lit de bas en haut : le recruteur cherche d'abord vos permis et vos cartes, parce que sans eux le reste ne sert à rien. Faites-lui gagner ce temps en les plaçant en haut de page, avec leurs dates de validité.",
+    priorities: [
+      {
+        title: 'Permis, cartes et validité',
+        body: "Catégories détenues, carte de qualification de conducteur, carte conducteur, attestations de formation continue : avec les dates. Une carte expirée écarte la candidature immédiatement.",
+      },
+      {
+        title: 'Le type de conduite',
+        body: "Messagerie urbaine, longue distance, frigorifique, matières dangereuses, benne : ce sont des métiers distincts. Précisez aussi le tonnage des véhicules conduits.",
+      },
+      {
+        title: 'Votre dossier de conduite',
+        body: "Kilomètres parcourus sans sinistre responsable, respect des temps de conduite, absence d'infraction : c'est le critère de sélection le plus discriminant, et rarement mis en avant.",
+      },
+    ],
+    mistakes: [
+      "Mettre les permis en bas du CV, au risque que le recruteur ne les cherche pas.",
+      "Rester vague sur le type de marchandises et de clientèle, alors que livrer des particuliers et des plateformes logistiques n'a rien à voir.",
+      "Oublier la manutention et l'usage des outils de suivi de tournée, qui font partie intégrante du poste.",
+    ],
+    template: 'moderne',
+    templateWhy:
+      "Un en-tête qui met permis et habilitations en évidence, avant même le détail des expériences.",
+  },
+  {
+    slug: 'data-analyst',
+    suggestionId: 'data',
+    metaTitle: 'Exemple de CV data analyst : outils, impact et méthode',
+    metaDescription:
+      'CV data analyst ou data scientist : outils et langages, volumétrie, décisions permises par vos analyses. Formulations d’exemple et modèle à remplir.',
+    h1: 'CV data : la décision, pas le tableau de bord',
+    intro:
+      "Le piège de ce métier est de décrire des livrables — des tableaux de bord, des modèles, des requêtes — sans dire ce qu'ils ont changé. Un tableau de bord que personne n'ouvre est un échec. Le CV qui convainc relie chaque production à une décision prise ou à un montant.",
+    priorities: [
+      {
+        title: 'Les outils et langages, nommés',
+        body: "SQL, Python, R, l'outil de visualisation, l'entrepôt de données : ce sont des critères de tri directs. Distinguez ce que vous pratiquez quotidiennement de ce que vous avez essayé.",
+      },
+      {
+        title: 'La volumétrie et la qualité des données',
+        body: "Analyser un fichier propre de dix mille lignes et une base de plusieurs milliards d'événements sont deux métiers. Le travail de fiabilisation, souvent l'essentiel du temps, mérite d'être cité.",
+      },
+      {
+        title: 'L’usage réel de vos analyses',
+        body: "Qui s'en est servi, pour décider quoi, avec quel effet chiffré. C'est ce qui distingue un analyste d'un producteur de graphiques.",
+      },
+    ],
+    mistakes: [
+      "Lister les algorithmes connus plutôt que les problèmes résolus.",
+      "Passer sous silence la partie ingrate — nettoyage, définition des indicateurs, discussion avec le métier — qui est justement ce que l'on recrute.",
+      "Confondre corrélation observée et effet démontré dans la description d'un résultat : un recruteur technique le relèvera.",
+    ],
+    template: 'moderne',
+    templateWhy:
+      "Une mise en page sobre où les outils restent lisibles par les filtres automatiques, très utilisés sur ces postes.",
+  },
+  {
+    slug: 'designer',
+    suggestionId: 'design',
+    metaTitle: 'Exemple de CV designer, graphiste et UX : portfolio et impact',
+    metaDescription:
+      'CV designer : lien vers le portfolio, périmètre des projets, effet mesuré des refontes. Exemples de formulations et modèle à remplir.',
+    h1: 'CV de designer : le portfolio décide, le CV oriente',
+    intro:
+      "Personne n'embauche un designer sur son CV : c'est le portfolio qui décide. Le CV a une seule mission, faire cliquer sur le lien et situer votre pratique. Un lien manquant ou mort est la faute la plus coûteuse du métier.",
+    priorities: [
+      {
+        title: 'Le lien, visible et vivant',
+        body: "En haut de page, court, et vérifié le matin même de l'envoi. Si le portfolio est protégé par un mot de passe, indiquez-le avec le moyen d'y accéder.",
+      },
+      {
+        title: 'Votre part exacte dans les projets',
+        body: "Recherche, maquettage, système de composants, direction artistique, production : dans un travail collectif, dites ce que vous avez fait vous-même. Les recruteurs de ce métier posent toujours la question.",
+      },
+      {
+        title: 'L’effet mesuré',
+        body: "Taux de conversion, temps passé sur une tâche, réduction des demandes au support : rare sur un CV de designer, et c'est exactement pour cela que ça marque.",
+      },
+    ],
+    mistakes: [
+      "Surcharger le CV lui-même d'effets graphiques : le document doit démontrer la maîtrise de la hiérarchie visuelle, pas la variété des polices.",
+      "Lister les logiciels comme une compétence en soi ; ils sont supposés acquis, c'est la méthode qui distingue.",
+      "Présenter des projets d'école quand on a déjà une pratique professionnelle.",
+    ],
+    template: 'creatif',
+    templateWhy:
+      "Un parti pris graphique assumé mais un corps de texte parfaitement lisible : exactement ce qu'on attend d'un designer.",
+  },
+  {
+    slug: 'juriste',
+    suggestionId: 'juridique',
+    metaTitle: 'Exemple de CV juriste : spécialités, volumes et enjeux',
+    metaDescription:
+      'CV juriste d’entreprise ou en cabinet : matières pratiquées, volume de contrats, enjeux financiers. Formulations d’exemple et modèle à remplir.',
+    h1: 'CV de juriste : la matière avant le titre',
+    intro:
+      "Le droit est un métier de spécialités qui ne se remplacent pas : un juriste des contrats n'est pas un juriste social, et un fiscaliste ne fait pas de la propriété intellectuelle. Le premier travail de votre CV est d'annoncer vos matières sans ambiguïté, dès le titre.",
+    priorities: [
+      {
+        title: 'Les matières réellement pratiquées',
+        body: "Contrats, social, fiscal, propriété intellectuelle, données personnelles, contentieux : nommez-les, et distinguez celles que vous traitez seul de celles où vous vous appuyez sur un conseil externe.",
+      },
+      {
+        title: 'Volumes et enjeux',
+        body: "Nombre de contrats par an, montants en jeu, nombre de dossiers contentieux suivis. Rédiger dix contrats-cadres à sept chiffres ou trois cents commandes est un exercice différent.",
+      },
+      {
+        title: 'Votre place dans l’organisation',
+        body: "Juriste unique d'une entreprise de deux cents personnes ou membre d'une direction juridique de quinze : le premier suppose une autonomie et une polyvalence bien plus larges.",
+      },
+    ],
+    mistakes: [
+      "Rester au niveau de l'intitulé sans annoncer les matières, ce qui oblige le recruteur à deviner.",
+      "Écrire un CV rédigé comme une note juridique : la concision est ici une compétence observée.",
+      "Laisser une imprécision de vocabulaire juridique, immédiatement repérée par un pair.",
+    ],
+    template: 'classique',
+    templateWhy:
+      "Une présentation traditionnelle et rigoureuse, attendue dans les directions juridiques comme dans les cabinets.",
+  },
 ]
 
 export function jobBySlug(slug: string): JobPage | undefined {
