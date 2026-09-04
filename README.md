@@ -35,7 +35,8 @@ reste utilisable, seules les fonctionnalités concernées sont désactivées.
 - **Éditeur avec aperçu instantané** — informations personnelles, profil,
   expériences, formation, compétences (avec niveau), langues et recommandations. Les entrées se
   réordonnent et se suppriment, les titres de section se renomment.
-- **5 modèles** — Moderne, Classique, Deux colonnes, Minimal, Créatif —
+- **10 modèles** — Moderne, Classique, Deux colonnes, Minimal, Créatif, Élégant,
+  Compact, Technique, Académique, ATS —
   interchangeables à tout moment sans perdre le contenu saisi.
 - **Mise en forme** — couleur d'accent (palette ou sélecteur libre), 4 familles
   typographiques, curseur de densité, affichage optionnel de la photo et des
@@ -508,9 +509,17 @@ supabase/
 2. L'enregistrer dans `templates/index.ts` et ajouter son identifiant à
    `TemplateId` dans `src/types.ts`.
 3. Ajouter sa vignette schématique dans `Thumb` (`components/editor/DesignPanel.tsx`).
+4. Ajouter son texte éditorial à `TEMPLATE_COPY` (`src/content/templates.ts`) : la
+   page `/modeles/<id>`, sa place dans le plan du site et ses métadonnées en
+   découlent, sans autre intervention.
 
 Exprimer les tailles en `em` et poser `className="avoid-break"` sur chaque entrée
 pour qu'une expérience ne soit jamais coupée par un saut de page.
+
+Un modèle dont la typographie fait partie du dessin — comme Élégant, qui impose
+sa serif — déclare `fixedFont` dans `templates/index.ts` : le panneau de mise en
+forme signale alors que le choix de police restera sans effet ici, plutôt que de
+laisser le réglage muet.
 
 ### Ajouter un métier aux suggestions
 

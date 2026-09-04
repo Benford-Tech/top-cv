@@ -89,6 +89,86 @@ export const TEMPLATE_COPY: TemplateCopy[] = [
     avoidIf:
       'Le secteur visé est conservateur : la couleur pleine largeur peut y être perçue comme déplacée.',
   },
+  {
+    id: 'elegant',
+    metaTitle: 'Modèle de CV élégant en serif, à remplir en ligne',
+    metaDescription:
+      'Un modèle de CV en typographie serif, capitales espacées et filets fins. Allure de document imprimé, aperçu A4 en temps réel et export PDF.',
+    h1: 'Modèle de CV élégant',
+    intro:
+      "Une serif, des capitales espacées, des filets d'un cheveu : rien ici ne vient d'un gabarit d'écran. La mise en page emprunte ses codes à l'imprimé — carton d'invitation, papier à en-tête — et cela suffit à la distinguer sans une once de couleur en aplat.",
+    suitedFor: [
+      'Les fonctions de direction et les postes de représentation',
+      'Le luxe, l’hôtellerie, l’édition, le notariat, les métiers d’art',
+      'Une candidature remise en main propre, ou imprimée pour un entretien',
+    ],
+    avoidIf:
+      'Vous postulez dans la tech ou une jeune entreprise : la serif y paraît volontiers datée.',
+  },
+  {
+    id: 'compact',
+    metaTitle: 'Modèle de CV compact : une carrière longue sur une page',
+    metaDescription:
+      'Un modèle de CV à deux colonnes de contenu et corps réduit, pour faire tenir un parcours long sur une seule page. À remplir en ligne.',
+    h1: 'Modèle de CV compact',
+    intro:
+      "Deux colonnes de contenu, pas de bandeau coloré, un interlignage serré : le parcours occupe la colonne large, la formation, les compétences et les langues se rangent dans l'étroite. C'est le modèle des carrières de quinze ans qu'un recruteur veut lire sur une page.",
+    suitedFor: [
+      'Les parcours de plus de dix ans, avec de nombreux postes',
+      'Les candidatures où la règle de la page unique est explicite',
+      'Les profils à double compétence, qui ont beaucoup à énumérer',
+    ],
+    avoidIf:
+      'Votre parcours tient déjà largement : la densité ne rendrait service à personne, et l’air est un confort de lecture.',
+  },
+  {
+    id: 'technique',
+    metaTitle: 'Modèle de CV technique avec grille de compétences notées',
+    metaDescription:
+      'Un modèle de CV à rail latéral gris, compétences notées sur cinq niveaux et dates en chasse fixe. Pensé pour les profils techniques.',
+    h1: 'Modèle de CV technique',
+    intro:
+      "Un rail gris — jamais coloré — porte les compétences, chacune notée sur cinq niveaux, et les dates s'écrivent en chasse fixe. Le recruteur technique cherche d'abord une pile technologique et un niveau de maîtrise : ils sont ici lisibles en un regard, avant même le récit des missions.",
+    suitedFor: [
+      'Le développement, les données, la cybersécurité, l’infrastructure',
+      'Les profils dont la valeur tient d’abord à un ensemble d’outils maîtrisés',
+      'Les candidatures où l’on attend une auto-évaluation explicite',
+    ],
+    avoidIf:
+      'Vos compétences sont difficiles à noter — une note sur cinq mal calibrée se retourne contre vous en entretien technique.',
+  },
+  {
+    id: 'academique',
+    metaTitle: 'Modèle de CV académique : rubriques numérotées, formation d’abord',
+    metaDescription:
+      'Un modèle de CV pour l’enseignement et la recherche : rubriques numérotées, formation avant expérience, aucune fioriture. À remplir en ligne.',
+    h1: 'Modèle de CV académique',
+    intro:
+      "La formation passe avant l'expérience et les rubriques sont numérotées : c'est la convention de l'enseignement et de la recherche, où le diplôme fonde la légitimité et où le document se lit comme un dossier. Aucune icône, aucune pastille — rien qui puisse être pris pour de l'ornement.",
+    suitedFor: [
+      'Les candidatures universitaires, doctorales et post-doctorales',
+      'L’enseignement, la recherche publique et privée, les concours',
+      'Les professions réglementées où le titre prime sur le poste',
+    ],
+    avoidIf:
+      'Vous visez le secteur privé hors recherche : y placer la formation en tête donne l’impression d’un parcours qui n’a pas commencé.',
+  },
+  {
+    id: 'ats',
+    metaTitle: 'Modèle de CV compatible ATS, lisible par les logiciels de tri',
+    metaDescription:
+      'Un modèle de CV sans couleur, sans icône et sur une seule colonne, conçu pour être analysé sans erreur par les logiciels de tri de candidatures.',
+    h1: 'Modèle de CV compatible ATS',
+    intro:
+      "Une colonne, aucune couleur, aucune icône, des puces qui sont de vrais tirets et des intitulés de rubrique en mots courants. Tout ce qui fait trébucher un analyseur automatique — colonnes multiples, texte en image, glyphes exotiques, information portée par une couleur — est ici absent par construction.",
+    suitedFor: [
+      'Les candidatures déposées dans un formulaire ou un portail d’emploi',
+      'Les grands groupes et les cabinets qui présélectionnent par logiciel',
+      'Un envoi en nombre, où l’on ne sait pas ce qui lira le document',
+    ],
+    avoidIf:
+      'Le CV part directement à une personne identifiée : cette austérité n’apporte alors rien, et un modèle plus soigné servira mieux.',
+  },
 ]
 
 export function templateCopy(id: TemplateId): TemplateCopy | undefined {

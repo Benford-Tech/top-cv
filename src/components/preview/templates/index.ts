@@ -6,12 +6,22 @@ import { Classique } from './Classique'
 import { Colonne } from './Colonne'
 import { Minimal } from './Minimal'
 import { Creatif } from './Creatif'
+import { Elegant } from './Elegant'
+import { Compact } from './Compact'
+import { Technique } from './Technique'
+import { Academique } from './Academique'
+import { Ats } from './Ats'
 
 export const TEMPLATES: {
   id: TemplateId
   name: string
   description: string
   Component: ComponentType<TemplateProps>
+  /**
+   * Modèles dont la typographie fait partie du dessin : le choix de police du
+   * panneau de mise en forme n'y a pas d'effet, et l'interface le dit.
+   */
+  fixedFont?: string
 }[] = [
   {
     id: 'moderne',
@@ -42,6 +52,37 @@ export const TEMPLATES: {
     name: 'Créatif',
     description: 'En-tête pleine largeur et frise chronologique.',
     Component: Creatif,
+  },
+  {
+    id: 'elegant',
+    name: 'Élégant',
+    description: 'Serif, capitales espacées, filets fins — allure imprimée.',
+    Component: Elegant,
+    fixedFont: 'une serif, qui fait tout son caractère',
+  },
+  {
+    id: 'compact',
+    name: 'Compact',
+    description: 'Deux colonnes de contenu, corps réduit : tient sur une page.',
+    Component: Compact,
+  },
+  {
+    id: 'technique',
+    name: 'Technique',
+    description: 'Rail de compétences notées, dates en chasse fixe.',
+    Component: Technique,
+  },
+  {
+    id: 'academique',
+    name: 'Académique',
+    description: 'Rubriques numérotées, formation avant expérience.',
+    Component: Academique,
+  },
+  {
+    id: 'ats',
+    name: 'ATS',
+    description: 'Sans couleur ni icône, pensé pour les logiciels de tri.',
+    Component: Ats,
   },
 ]
 

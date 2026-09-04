@@ -53,7 +53,17 @@ export type Recommendation = {
   text: string
 }
 
-export type TemplateId = 'moderne' | 'classique' | 'colonne' | 'minimal' | 'creatif'
+export type TemplateId =
+  | 'moderne'
+  | 'classique'
+  | 'colonne'
+  | 'minimal'
+  | 'creatif'
+  | 'elegant'
+  | 'compact'
+  | 'technique'
+  | 'academique'
+  | 'ats'
 
 export type Settings = {
   template: TemplateId

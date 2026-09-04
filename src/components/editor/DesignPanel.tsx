@@ -1,6 +1,6 @@
 import type { Resume, Settings } from '../../types'
 import { ACCENTS, FONTS } from '../../data/defaults'
-import { TEMPLATES } from '../preview/templates'
+import { TEMPLATES, templateById } from '../preview/templates'
 import { SectionCard } from './SectionCard'
 import { Toggle } from '../ui/controls'
 
@@ -71,6 +71,97 @@ function Thumb({ id, accent }: { id: Resume['settings']['template']; accent: str
     )
   }
 
+  if (id === 'elegant') {
+    return (
+      <div className="flex h-full flex-col items-center gap-[4px] p-[6px]">
+        {bar('60%', '#57534e', 5)}
+        {bar('30%', accent)}
+        <div className="mt-[2px] flex w-full items-center gap-[3px]">
+          {bar('28%', accent, 2)}
+          <div className="h-px flex-1 bg-stone-300" />
+        </div>
+        {body}
+        <div className="flex w-full items-center gap-[3px]">
+          {bar('28%', accent, 2)}
+          <div className="h-px flex-1 bg-stone-300" />
+        </div>
+        {body}
+      </div>
+    )
+  }
+
+  if (id === 'compact') {
+    return (
+      <div className="flex h-full flex-col gap-[4px] p-[5px]">
+        <div className="flex items-end justify-between gap-[4px] border-b-2 pb-[3px]" style={{ borderColor: accent }}>
+          {bar('45%', '#94a3b8', 4)}
+          {bar('25%', '#cbd5e1', 2)}
+        </div>
+        <div className="flex flex-1 gap-[5px]">
+          <div className="flex flex-[3] flex-col gap-[3px]">
+            {bar('50%', accent, 2)}
+            {body}
+            {body}
+          </div>
+          <div className="flex flex-[2] flex-col gap-[3px]">
+            {bar('60%', accent, 2)}
+            {body}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (id === 'technique') {
+    return (
+      <div className="flex h-full gap-[4px] p-[5px]">
+        <div className="flex w-1/3 flex-col gap-[3px] rounded-[2px] bg-slate-100 p-[3px]">
+          {bar('70%', '#94a3b8', 2)}
+          {bar('90%', accent, 2)}
+          {bar('60%', accent, 2)}
+          {bar('80%', accent, 2)}
+        </div>
+        <div className="flex flex-1 flex-col gap-[4px]">
+          {bar('65%', '#94a3b8', 4)}
+          {body}
+          {body}
+        </div>
+      </div>
+    )
+  }
+
+  if (id === 'academique') {
+    return (
+      <div className="flex h-full flex-col gap-[4px] p-[6px]">
+        {bar('55%', '#94a3b8', 4)}
+        <div className="flex items-center gap-[3px] border-b pb-[2px]" style={{ borderColor: accent }}>
+          <div className="h-[3px] w-[3px] rounded-full" style={{ background: accent }} />
+          {bar('40%', '#cbd5e1', 2)}
+        </div>
+        {body}
+        <div className="flex items-center gap-[3px] border-b pb-[2px]" style={{ borderColor: accent }}>
+          <div className="h-[3px] w-[3px] rounded-full" style={{ background: accent }} />
+          {bar('45%', '#cbd5e1', 2)}
+        </div>
+        {body}
+      </div>
+    )
+  }
+
+  if (id === 'ats') {
+    // Aucune couleur dans la miniature non plus : c'est tout le propos.
+    return (
+      <div className="flex h-full flex-col gap-[5px] p-[6px]">
+        {bar('50%', '#334155', 4)}
+        {bar('30%', '#94a3b8', 2)}
+        <div className="mt-[2px]">{bar('35%', '#334155', 3)}</div>
+        {body}
+        {bar('35%', '#334155', 3)}
+        {body}
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full flex-col gap-[5px] p-[6px]">
       <div className="flex items-center gap-[4px]">
@@ -92,6 +183,8 @@ export function DesignPanel({
   settings: Settings
   onChange: (patch: Partial<Settings>) => void
 }) {
+  const fixedFont = templateById(settings.template).fixedFont
+
   return (
     <div className="space-y-4">
       <SectionCard title="Modèle">
@@ -156,6 +249,13 @@ export function DesignPanel({
       </SectionCard>
 
       <SectionCard title="Typographie et densité">
+        {fixedFont ? (
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Le modèle {templateById(settings.template).name} impose {fixedFont}. Le choix
+            ci-dessous ne s’appliquera qu’aux autres modèles.
+          </p>
+        ) : null}
+
         <div className="grid grid-cols-2 gap-2">
           {FONTS.map((font) => (
             <button
