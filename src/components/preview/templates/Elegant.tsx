@@ -1,6 +1,7 @@
 import { formatRange } from '../../../lib/format'
 import {
   Bullets,
+  Photo,
   RecommendationList,
   contactItems,
   fullName,
@@ -20,7 +21,7 @@ import {
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif'
 
 export function Elegant({ resume, accent }: TemplateProps) {
-  const { personal, labels } = resume
+  const { personal, settings, labels } = resume
   const contacts = contactItems(personal)
 
   const heading = (text: string) => (
@@ -75,6 +76,11 @@ export function Elegant({ resume, accent }: TemplateProps) {
   return (
     <div style={{ padding: '18mm 17mm 15mm', color: '#1c1917', fontFamily: SERIF }}>
       <header style={{ textAlign: 'center', marginBottom: '9mm' }}>
+        {settings.showPhoto && personal.photo ? (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3.5mm' }}>
+            <Photo src={personal.photo} size="27mm" />
+          </div>
+        ) : null}
         <h1
           style={{
               fontSize: '2.1em',

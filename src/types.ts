@@ -64,6 +64,9 @@ export type TemplateId =
   | 'technique'
   | 'academique'
   | 'ats'
+  | 'portrait'
+  | 'ardoise'
+  | 'cartes'
 
 export type Settings = {
   template: TemplateId

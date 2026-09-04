@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Resume, Settings } from '../../types'
 import { ACCENTS, FONTS } from '../../data/defaults'
 import { TEMPLATES, templateById } from '../preview/templates'
@@ -162,6 +163,74 @@ function Thumb({ id, accent }: { id: Resume['settings']['template']; accent: str
     )
   }
 
+  if (id === 'portrait') {
+    return (
+      <div className="flex h-full flex-col">
+        <div className="flex items-center gap-[4px] p-[5px]" style={{ background: accent }}>
+          <div className="h-[14px] w-[14px] flex-none rounded-full bg-white/70" />
+          <div className="flex flex-1 flex-col gap-[3px]">
+            {bar('80%', 'rgba(255,255,255,.9)', 4)}
+            {bar('50%', 'rgba(255,255,255,.6)', 2)}
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col gap-[4px] p-[5px]">
+          {bar('45%', accent, 2)}
+          {body}
+          {bar('45%', accent, 2)}
+          {body}
+        </div>
+      </div>
+    )
+  }
+
+  if (id === 'ardoise') {
+    return (
+      <div className="flex h-full gap-[4px] p-[5px]">
+        <div className="flex w-2/5 flex-col items-center gap-[4px] rounded-[2px] bg-slate-800 p-[4px]">
+          <div className="h-[13px] w-[13px] rounded-full bg-white/25" />
+          {bar('85%', 'rgba(255,255,255,.5)', 2)}
+          {bar('70%', accent, 2)}
+          {bar('80%', 'rgba(255,255,255,.3)', 2)}
+        </div>
+        <div className="flex flex-1 flex-col gap-[4px]">
+          {bar('60%', '#334155', 3)}
+          {body}
+          {bar('60%', '#334155', 3)}
+          {body}
+        </div>
+      </div>
+    )
+  }
+
+  if (id === 'cartes') {
+    const cardBox = (children: ReactNode) => (
+      <div className="rounded-[2px] border border-slate-300 bg-white p-[3px]">{children}</div>
+    )
+    return (
+      <div className="flex h-full flex-col gap-[4px] bg-slate-100 p-[4px]">
+        <div className="rounded-[2px] border border-slate-300 bg-white p-[3px]" style={{ borderTopColor: accent, borderTopWidth: 2 }}>
+          <div className="flex items-center gap-[3px]">
+            <div className="h-[10px] w-[10px] rounded-[2px] bg-slate-200" />
+            <div className="flex-1">{bar('70%', '#94a3b8', 3)}</div>
+          </div>
+        </div>
+        {cardBox(
+          <div className="flex flex-col gap-[3px]">
+            {bar('40%', accent, 2)}
+            {bar('90%')}
+            {bar('75%')}
+          </div>,
+        )}
+        {cardBox(
+          <div className="flex flex-col gap-[3px]">
+            {bar('40%', accent, 2)}
+            {bar('85%')}
+          </div>,
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full flex-col gap-[5px] p-[6px]">
       <div className="flex items-center gap-[4px]">
@@ -183,7 +252,7 @@ export function DesignPanel({
   settings: Settings
   onChange: (patch: Partial<Settings>) => void
 }) {
-  const fixedFont = templateById(settings.template).fixedFont
+  const { fixedFont, noPhoto, noSkillLevels } = templateById(settings.template)
 
   return (
     <div className="space-y-4">
@@ -299,11 +368,13 @@ export function DesignPanel({
             checked={settings.showPhoto}
             onChange={(value) => onChange({ showPhoto: value })}
             label="Afficher la photo"
+            disabledReason={noPhoto}
           />
           <Toggle
             checked={settings.showSkillLevels}
             onChange={(value) => onChange({ showSkillLevels: value })}
             label="Afficher les niveaux de compétence"
+            disabledReason={noSkillLevels}
           />
         </div>
       </SectionCard>

@@ -169,6 +169,54 @@ export const TEMPLATE_COPY: TemplateCopy[] = [
     avoidIf:
       'Le CV part directement à une personne identifiée : cette austérité n’apporte alors rien, et un modèle plus soigné servira mieux.',
   },
+  {
+    id: 'portrait',
+    metaTitle: 'Modèle de CV avec photo dans un bandeau coloré',
+    metaDescription:
+      'Un modèle de CV à photo ronde dans un bandeau coloré, nom et coordonnées à côté. À remplir en ligne, aperçu A4 en temps réel et export PDF.',
+    h1: 'Modèle de CV avec photo',
+    intro:
+      "La photo, ronde, occupe le bandeau coloré avec le nom, le titre et les coordonnées ; le corps du CV démarre ensuite sur fond blanc, en une colonne. C'est la disposition la plus répandue des banques de modèles françaises, et celle qu'un recruteur reconnaît sans avoir à la déchiffrer.",
+    suitedFor: [
+      'Les métiers de contact : commerce, accueil, santé, immobilier',
+      'Une candidature en France, où la photo reste d’usage courant',
+      'Les profils juniors, à qui un visage donne une présence que le parcours n’a pas encore',
+    ],
+    avoidIf:
+      'Vous postulez au Royaume-Uni, en Irlande ou en Amérique du Nord : la photo y est déconseillée, parfois écartée d’office pour prévenir les discriminations.',
+  },
+  {
+    id: 'ardoise',
+    metaTitle: 'Modèle de CV à colonne sombre, sobre et contrasté',
+    metaDescription:
+      'Un modèle de CV à colonne anthracite pleine hauteur, la couleur d’accent réduite aux repères. À remplir en ligne, export PDF au texte réel.',
+    h1: 'Modèle de CV à colonne sombre',
+    intro:
+      "Une colonne anthracite tient toute la hauteur — photo, coordonnées, compétences, langues — et la couleur d'accent ne sert plus qu'aux repères. Le contraste est fort sans être criard, là où un aplat vif sur toute une page se défend mal dans les secteurs sobres.",
+    suitedFor: [
+      'Le conseil, la finance, l’industrie, l’ingénierie',
+      'Les profils confirmés qui veulent du caractère sans couleur vive',
+      'Une candidature lue à l’écran plutôt qu’imprimée',
+    ],
+    avoidIf:
+      'Le CV sera imprimé en nombre : un aplat sombre pleine hauteur consomme beaucoup d’encre et grise à la photocopie.',
+  },
+  {
+    id: 'cartes',
+    metaTitle: 'Modèle de CV en cartes : chaque rubrique dans son cadre',
+    metaDescription:
+      'Un modèle de CV où chaque rubrique occupe son propre cadre, sur fond gris clair. Lecture par blocs, à remplir en ligne avec aperçu A4.',
+    h1: 'Modèle de CV en cartes',
+    intro:
+      "Chaque rubrique occupe son cadre, posé sur un fond gris clair. La lecture se fait par blocs : l'œil saute d'un cadre à l'autre au lieu de descendre une colonne, ce qui aide quand les rubriques sont nombreuses et de longueurs inégales.",
+    suitedFor: [
+      'Les parcours composites : missions, projets, bénévolat, certifications',
+      'Les profils en reconversion, dont les rubriques ne se suivent pas naturellement',
+      'Les candidatures dans le numérique et les services, habitués à cette grammaire visuelle',
+    ],
+    avoidIf:
+      'Votre CV tient en trois rubriques courtes : les cadres paraîtront alors une décoration sans objet.',
+  },
 ]
 
 export function templateCopy(id: TemplateId): TemplateCopy | undefined {

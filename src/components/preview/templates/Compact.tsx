@@ -1,6 +1,7 @@
 import { formatRange } from '../../../lib/format'
 import {
   Bullets,
+  Photo,
   RecommendationList,
   contactItems,
   fullName,
@@ -16,7 +17,7 @@ import {
  * bandeau : une grille CSS se coupe mal d'une page à l'autre à l'impression.
  */
 export function Compact({ resume, accent }: TemplateProps) {
-  const { personal, labels } = resume
+  const { personal, settings, labels } = resume
   const contacts = contactItems(personal)
 
   const heading = (text: string) => (
@@ -70,13 +71,18 @@ export function Compact({ resume, accent }: TemplateProps) {
           marginBottom: '6mm',
         }}
       >
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4mm', minWidth: 0 }}>
+          {settings.showPhoto && personal.photo ? (
+            <Photo src={personal.photo} size="20mm" rounded="1.5mm" />
+          ) : null}
+          <div style={{ minWidth: 0 }}>
           <h1 style={{ fontSize: '1.75em', fontWeight: 700, color: '#0f172a', lineHeight: 1.1 }}>
             {fullName(personal) || 'Votre nom'}
           </h1>
           {personal.title ? (
             <p style={{ fontSize: '0.95em', color: accent, fontWeight: 600 }}>{personal.title}</p>
           ) : null}
+          </div>
         </div>
         <div style={{ textAlign: 'right', fontSize: '0.78em', color: '#64748b', lineHeight: 1.6 }}>
           {contacts.map((item) => (

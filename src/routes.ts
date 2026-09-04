@@ -4,7 +4,7 @@ import { TEMPLATE_COPY } from './content/templates'
 
 export const SITE_TITLE = 'CV Studio — créez un CV professionnel et téléchargez-le en PDF'
 export const SITE_DESCRIPTION =
-  'Éditeur de CV en ligne : aperçu A4 en temps réel, 10 modèles, import de votre profil LinkedIn (recommandations comprises) et export PDF au texte réel, lisible par les logiciels de tri des recruteurs.'
+  'Éditeur de CV en ligne : aperçu A4 en temps réel, 13 modèles, import de votre profil LinkedIn (recommandations comprises) et export PDF au texte réel, lisible par les logiciels de tri des recruteurs.'
 
 export type RouteMeta = {
   path: string

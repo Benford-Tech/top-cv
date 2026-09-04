@@ -1,6 +1,7 @@
 import { formatRange } from '../../../lib/format'
 import {
   Bullets,
+  Photo,
   RecommendationList,
   contactItems,
   fullName,
@@ -8,7 +9,7 @@ import {
 } from './parts'
 
 export function Classique({ resume, accent }: TemplateProps) {
-  const { personal, labels } = resume
+  const { personal, settings, labels } = resume
   const contacts = contactItems(personal)
 
   const heading = (text: string) => (
@@ -33,6 +34,11 @@ export function Classique({ resume, accent }: TemplateProps) {
   return (
     <div style={{ padding: '16mm 16mm 14mm' }}>
       <header style={{ textAlign: 'center', paddingBottom: '4mm' }}>
+        {settings.showPhoto && personal.photo ? (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3mm' }}>
+            <Photo src={personal.photo} size="26mm" />
+          </div>
+        ) : null}
         <h1
           style={{
             fontSize: '2.2em',

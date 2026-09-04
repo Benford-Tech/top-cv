@@ -2,6 +2,7 @@ import { formatRange } from '../../../lib/format'
 import {
   Bullets,
   LevelBar,
+  Photo,
   RecommendationList,
   contactItems,
   fullName,
@@ -18,7 +19,7 @@ const RAIL = '52mm'
 const MONO = '"SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace'
 
 export function Technique({ resume, accent }: TemplateProps) {
-  const { personal, labels } = resume
+  const { personal, settings, labels } = resume
   const contacts = contactItems(personal)
 
   const heading = (text: string, color = accent) => (
@@ -53,6 +54,12 @@ export function Technique({ resume, accent }: TemplateProps) {
           borderRight: '1px solid #e2e8f0',
         }}
       >
+        {settings.showPhoto && personal.photo ? (
+          <div style={{ marginBottom: '6mm' }}>
+            <Photo src={personal.photo} size="30mm" rounded="1.5mm" />
+          </div>
+        ) : null}
+
         {contacts.length > 0 ? (
           <section style={{ marginBottom: '7mm' }}>
             {heading('Contact', '#64748b')}
@@ -82,7 +89,9 @@ export function Technique({ resume, accent }: TemplateProps) {
                   <p style={{ fontSize: '0.78em', color: '#334155', marginBottom: '0.15em' }}>
                     {item.name}
                   </p>
-                  <LevelBar level={item.level} accent={accent} muted="#e2e8f0" />
+                  {settings.showSkillLevels ? (
+                    <LevelBar level={item.level} accent={accent} muted="#e2e8f0" />
+                  ) : null}
                 </div>
               ))}
           </section>

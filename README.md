@@ -35,8 +35,8 @@ reste utilisable, seules les fonctionnalités concernées sont désactivées.
 - **Éditeur avec aperçu instantané** — informations personnelles, profil,
   expériences, formation, compétences (avec niveau), langues et recommandations. Les entrées se
   réordonnent et se suppriment, les titres de section se renomment.
-- **10 modèles** — Moderne, Classique, Deux colonnes, Minimal, Créatif, Élégant,
-  Compact, Technique, Académique, ATS —
+- **13 modèles** — Moderne, Classique, Deux colonnes, Minimal, Créatif, Élégant,
+  Compact, Technique, Académique, ATS, Portrait, Ardoise, Cartes —
   interchangeables à tout moment sans perdre le contenu saisi.
 - **Mise en forme** — couleur d'accent (palette ou sélecteur libre), 4 familles
   typographiques, curseur de densité, affichage optionnel de la photo et des
@@ -519,7 +519,11 @@ pour qu'une expérience ne soit jamais coupée par un saut de page.
 Un modèle dont la typographie fait partie du dessin — comme Élégant, qui impose
 sa serif — déclare `fixedFont` dans `templates/index.ts` : le panneau de mise en
 forme signale alors que le choix de police restera sans effet ici, plutôt que de
-laisser le réglage muet.
+laisser le réglage muet. Même mécanisme pour `noPhoto` et `noSkillLevels`, quand
+un modèle se passe délibérément de portrait ou de jauges : le réglage
+correspondant est désactivé et la raison affichée. Un modèle qui accepte la
+photo doit lire `settings.showPhoto`, et tout modèle qui affiche des jauges doit
+lire `settings.showSkillLevels` — sans quoi l'interrupteur ment.
 
 ### Ajouter un métier aux suggestions
 

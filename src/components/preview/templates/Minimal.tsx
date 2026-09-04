@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { formatRange } from '../../../lib/format'
 import {
   Bullets,
+  Photo,
   RecommendationList,
   contactItems,
   fullName,
@@ -29,7 +30,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export function Minimal({ resume, accent }: TemplateProps) {
-  const { personal, labels } = resume
+  const { personal, settings, labels } = resume
   const contacts = contactItems(personal)
 
   const heading = (text: string) => (
@@ -50,6 +51,8 @@ export function Minimal({ resume, accent }: TemplateProps) {
   return (
     <div style={{ padding: '20mm 18mm 16mm' }}>
       <header style={{ marginBottom: '10mm' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6mm' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
         <h1
           style={{
             fontSize: '2em',
@@ -63,6 +66,11 @@ export function Minimal({ resume, accent }: TemplateProps) {
         {personal.title ? (
           <p style={{ fontSize: '1em', color: '#475569', marginTop: '0.2em' }}>{personal.title}</p>
         ) : null}
+          </div>
+          {settings.showPhoto && personal.photo ? (
+            <Photo src={personal.photo} size="26mm" rounded="2mm" />
+          ) : null}
+        </div>
         <div
           style={{
             marginTop: '1em',

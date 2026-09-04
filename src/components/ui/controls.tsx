@@ -90,34 +90,55 @@ export function Toggle({
   checked,
   onChange,
   label,
+  /**
+   * Raison pour laquelle le réglage ne s'applique pas au modèle courant. Un
+   * interrupteur sans effet est pire qu'un interrupteur absent : renseignée,
+   * elle le désactive et l'explique.
+   */
+  disabledReason,
 }: {
   checked: boolean
   onChange: (value: boolean) => void
   label: string
+  disabledReason?: string
 }) {
+  const off = Boolean(disabledReason)
+
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+    <label
+      title={disabledReason}
+      className={`flex items-center gap-2 text-sm ${
+        off ? 'cursor-not-allowed text-slate-400' : 'cursor-pointer text-slate-700'
+      }`}
+    >
       <span
         role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
+        aria-checked={off ? false : checked}
+        aria-disabled={off || undefined}
+        onClick={() => !off && onChange(!checked)}
         className={`relative h-5 w-9 flex-none rounded-full transition ${
-          checked ? 'bg-blue-600' : 'bg-slate-300'
+          off ? 'bg-slate-200' : checked ? 'bg-blue-600' : 'bg-slate-300'
         }`}
       >
         <span
           className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
-            checked ? 'left-4.5' : 'left-0.5'
+            checked && !off ? 'left-4.5' : 'left-0.5'
           }`}
         />
       </span>
       <input
         type="checkbox"
         className="sr-only"
-        checked={checked}
+        checked={off ? false : checked}
+        disabled={off}
         onChange={(event) => onChange(event.target.checked)}
       />
-      {label}
+      <span>
+        {label}
+        {disabledReason ? (
+          <span className="block text-xs text-slate-400">Sans effet ici : {disabledReason}.</span>
+        ) : null}
+      </span>
     </label>
   )
 }
