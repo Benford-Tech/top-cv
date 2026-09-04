@@ -145,6 +145,7 @@ export function mapProviderProfile(payload: Json): LinkedInImport {
     summary: str(root, 'summary', 'about', 'description'),
     city: joinLocation(root),
     email: str(root, 'email', 'personal_email'),
+    phone: str(root, 'phone', 'phone_number', 'personal_phone'),
     experiences,
     education,
     skills,

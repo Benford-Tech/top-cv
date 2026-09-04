@@ -150,7 +150,7 @@ export function parseLinkedInPdfText(text: string): LinkedInImport {
   const sections = sectionise(lines)
 
   const result: LinkedInImport = {
-    firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '',
+    firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '', phone: '',
     experiences: [], education: [], skills: [], languages: [], recommendations: [],
     filesUsed: [], filesIgnored: [],
   }

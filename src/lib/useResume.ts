@@ -135,6 +135,7 @@ export function useResume() {
         summary?: string
         city?: string
         email?: string
+        phone?: string
       },
       keys: ListKey[],
       mode: 'replace' | 'append',
@@ -167,6 +168,9 @@ export function useResume() {
         }
         if (incoming.email && !prev.personal.email) {
           next.personal = { ...next.personal, email: incoming.email }
+        }
+        if (incoming.phone && !prev.personal.phone) {
+          next.personal = { ...next.personal, phone: incoming.phone }
         }
         if (incoming.summary && !prev.summary.trim()) {
           next.summary = incoming.summary

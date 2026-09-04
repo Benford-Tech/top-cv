@@ -57,8 +57,42 @@ const MONTHS: Record<string, string> = {
   janv: '01', fevr: '02', avr: '04', juil: '07', sept: '09', oct: '10', nov: '11', dec: '12',
   january: '01', february: '02', march: '03', april: '04', may: '05', june: '06',
   july: '07', august: '08', september: '09', october: '10', november: '11', december: '12',
-  jan: '01', feb: '02', mar: '03', apr: '04', jun: '06', jul: '07', aug: '08', nov2: '11',
+  jan: '01', feb: '02', mar: '03', apr: '04', jun: '06', jul: '07', aug: '08',
 }
+
+/**
+ * Uniformise les caracteres que Word substitue en cours de frappe.
+ *
+ * La correction automatique remplace l'apostrophe droite par une courbe :
+ * « Aujourd’hui » ne repondait donc a aucun motif ecrit avec « aujourd'hui »,
+ * et une experience en cours disparaissait entierement de l'import. Les espaces
+ * insecables, eux, cassaient les separations sur l'espace.
+ */
+function tidy(line: string): string {
+  return line
+    .replace(/[\u2018\u2019\u201b\u02bc]/g, "'")
+    .replace(/[\u00a0\u202f\u2007\u2009]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const ACCENTS: Record<string, string> = {
+  a: 'aàâä', e: 'eéèêë', i: 'iîï', o: 'oôö', u: 'uùûü', c: 'cç',
+}
+
+/** « fevrier » -> « f[eéèêë]vri[eéèêë]r » : le mois s'ecrit accentue sur un CV. */
+function accentTolerant(word: string): string {
+  return [...word].map((letter) => (ACCENTS[letter] ? `[${ACCENTS[letter]}]` : letter)).join('')
+}
+
+/**
+ * Alternative des noms de mois, du plus long au plus court pour que
+ * « septembre » l'emporte sur « sept ».
+ */
+const MONTH_PATTERN = Object.keys(MONTHS)
+  .sort((a, b) => b.length - a.length)
+  .map(accentTolerant)
+  .join('|')
 
 const NOW = /^(aujourd hui|present|actuel|actuelle|en cours|a ce jour|now|current)$/
 
@@ -91,16 +125,30 @@ export type DateRange = { start: string; end: string; current: boolean; rest: st
  * rediges sous Word.
  */
 export function findRange(line: string): DateRange | null {
-  const token = String.raw`(?:\d{1,2}[/.]\d{4}|[A-Za-zÀ-ÿ]{3,10}\.?\s+\d{4}|\d{4})`
+  // Le nom de mois est valide contre la table, jamais pris pour un mot
+  // quelconque : « Acme 2019 » se lisait sinon comme une date, et l'employeur
+  // partait avec elle.
+  const token = String.raw`(?:\d{1,2}[/.]\d{4}|(?:${MONTH_PATTERN})\.?\s+\d{4}|\d{4})`
   const tail = String.raw`(?:${token}|aujourd'hui|pr[ée]sent|actuel(?:le)?|en cours|[àa] ce jour|now|current|present)`
   const pattern = new RegExp(
     String.raw`(?:depuis\s+(${token}))|(${token})\s*(?:[-–—]|\bau?\b|\bto\b)\s*(${tail})`,
     'i',
   )
-  const match = pattern.exec(line)
+  // `tidy` ici aussi : la fonction est exportee et sert au lecteur de PDF, qui
+  // ne passe pas forcement par `parseResumeLines`. Une apostrophe courbe ne
+  // doit pas dependre de qui appelle.
+  const match = pattern.exec(tidy(line))
   if (!match) return null
 
-  const rest = line.replace(match[0], ' ').replace(/\s*[:|–—-]\s*/g, ' ').replace(/\s+/g, ' ').trim()
+  // Seuls les separateurs de bordure sautent. Les retirer partout, comme
+  // auparavant, effacait le tiret sur lequel « Chef de projet — Acme » se
+  // coupe en intitule et employeur.
+  const rest = tidy(line)
+    .replace(match[0], ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s:|,;·–—-]+/, '')
+    .replace(/[\s:|,;·–—-]+$/, '')
+    .trim()
 
   // « Depuis 2021 » : un seul repere, poste en cours.
   if (match[1]) {
@@ -132,16 +180,49 @@ function splitRole(text: string): { position: string; company: string } {
   }
 }
 
+/** Formats francais et internationaux : +33 6 12 34 56 78, 06.12.34.56.78, (0)6… */
+const PHONE = /(?:\+|00)?\d[\d\s().-]{8,18}\d/
+
+/** Une ligne de descriptif, jamais un intitule de poste. */
+const BULLET = /^[-•·*▪◦–—]\s/
+
+/** Formes juridiques : « Acme, Inc. » n'est pas une entreprise a Inc. */
+const LEGAL = /^(inc|llc|ltd|sa|sas|sasu|sarl|eurl|gmbh|ag|bv|nv|spa|srl|plc|corp|co|group|groupe|company|cie)\.?$/i
+
+/**
+ * Detache la ville collee a l'employeur (« Groupe Verlaine, Lyon »).
+ *
+ * Prudent par construction : un seul segment, apres la derniere virgule, court,
+ * capitalise, sans chiffre et sans forme juridique. Au moindre doute la chaine
+ * reste entiere — une ville manquante se corrige d'un coup d'oeil, un employeur
+ * ampute non.
+ */
+export function splitCity(value: string): { value: string; city: string } {
+  const at = value.lastIndexOf(',')
+  if (at < 0) return { value, city: '' }
+
+  const head = value.slice(0, at).trim()
+  const tail = value.slice(at + 1).trim()
+  if (!head || !tail) return { value, city: '' }
+  if (tail.length > 30 || /\d/.test(tail)) return { value, city: '' }
+  if (!/^[A-ZÀ-Þ]/.test(tail)) return { value, city: '' }
+
+  const words = tail.split(/\s+/)
+  if (words.length > 3 || words.some((word) => LEGAL.test(word))) return { value, city: '' }
+
+  return { value: head, city: tail }
+}
+
 const LIST_SEPARATOR = /\s*[,;·•|\/]\s*/
 
 const EMPTY: LinkedInImport = {
-  firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '',
+  firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '', phone: '',
   experiences: [], education: [], skills: [], languages: [], recommendations: [],
   filesUsed: [], filesIgnored: [],
 }
 
 export function parseResumeLines(input: string[]): LinkedInImport {
-  const lines = input.map((line) => line.replace(/\s+/g, ' ').trim()).filter(Boolean)
+  const lines = input.map(tidy).filter(Boolean)
 
   const result: LinkedInImport = {
     ...EMPTY,
@@ -182,8 +263,26 @@ export function parseResumeLines(input: string[]): LinkedInImport {
     const after = header[header.indexOf(nameLine) + 1]
     if (after && !/@|\d{4}/.test(after) && after.length < 80) result.headline = after
   }
-  const city = header.find((line) => /\b\d{5}\b/.test(line) || (line.includes(',') && line.length < 50))
-  if (city) result.city = city
+  // Une adresse postale complete n'est pas une ville : le champ du CV attend
+  // « Lyon », pas « 12 rue des Lilas, 69003 Lyon ».
+  const address = header.find(
+    (line) => /\b\d{5}\b/.test(line) || (line.includes(',') && line.length < 50),
+  )
+  if (address) {
+    const postal = /\b\d{5}\b\s+([^,;|]+)/.exec(address)
+    result.city = postal ? postal[1].trim() : address
+  }
+
+  // Le telephone ne figure pas dans un export LinkedIn ; sur un CV, si. Cherche
+  // dans le seul en-tete, ou il vit, et exige assez de chiffres pour ne pas
+  // confondre avec une annee ou un montant.
+  for (const line of header) {
+    const found = PHONE.exec(line)
+    if (found && (found[0].match(/\d/g) ?? []).length >= 9) {
+      result.phone = found[0].trim()
+      break
+    }
+  }
 
   const profileLines = sections.get('profile')
   if (profileLines?.length) result.summary = profileLines.join(' ')
@@ -197,8 +296,20 @@ export function parseResumeLines(input: string[]): LinkedInImport {
     for (const line of source) {
       const range = findRange(line)
       if (!range) {
-        if (entries.length > 0 && buffer.length === 0) entries[entries.length - 1].body.push(line)
-        else buffer.push(line)
+        const last = entries[entries.length - 1]
+        // Une date seule sur sa ligne, l'intitule juste en dessous : c'est la
+        // disposition la plus repandue sous Word. Tant que l'entree ouverte
+        // n'a pas d'en-tete, la premiere ligne qui suit en tient lieu — sauf
+        // une puce, qui appartient toujours au descriptif.
+        if (last && last.head.length === 0 && !BULLET.test(line)) {
+          last.head.push(line)
+          continue
+        }
+        if (last && buffer.length === 0) {
+          last.body.push(line)
+          continue
+        }
+        buffer.push(line)
         continue
       }
       // La date porte parfois l'intitule sur la meme ligne ; sinon on reprend
@@ -211,13 +322,13 @@ export function parseResumeLines(input: string[]): LinkedInImport {
   }
 
   for (const entry of collect('experience')) {
-    const first = entry.head[0] ?? ''
-    const { position, company } = splitRole(first)
+    const { position, company } = splitRole(entry.head[0] ?? '')
+    const employer = splitCity(company || entry.head[1] || '')
     result.experiences.push({
       id: uid(),
       position,
-      company: company || entry.head[1] || '',
-      city: '',
+      company: employer.value,
+      city: employer.city,
       start: entry.range.start,
       end: entry.range.end,
       current: entry.range.current,
@@ -226,13 +337,13 @@ export function parseResumeLines(input: string[]): LinkedInImport {
   }
 
   for (const entry of collect('education')) {
-    const first = entry.head[0] ?? ''
-    const { position, company } = splitRole(first)
+    const { position, company } = splitRole(entry.head[0] ?? '')
+    const school = splitCity(company || entry.head[1] || '')
     result.education.push({
       id: uid(),
       degree: position,
-      school: company || entry.head[1] || '',
-      city: '',
+      school: school.value,
+      city: school.city,
       start: entry.range.start,
       end: entry.range.end,
       description: entry.body.join('\n'),

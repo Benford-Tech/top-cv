@@ -80,13 +80,23 @@ export function LinkedInModal({
       if (isEmptyImport(parsed)) {
         setData(parsed)
         setError(
-          "Aucune donnée exploitable n'a été trouvée. Vérifiez qu'il s'agit bien de l'archive « Obtenir une copie de vos données » de LinkedIn.",
+          "Le fichier a bien été lu, mais aucune donnée exploitable n'y a été reconnue. " +
+            'Sur un CV, les rubriques sont repérées par leurs intitulés (« Expérience », ' +
+            '« Formation », « Compétences ») et par les dates : un document sans ces repères, ' +
+            'ou dont le texte est une image, ne peut pas être analysé.',
         )
       } else {
         setData(parsed)
       }
-    } catch {
-      setError("Ce fichier n'a pas pu être ouvert. Attendu : l'archive ZIP de LinkedIn, ou ses fichiers CSV.")
+    } catch (failure) {
+      // Le message du lecteur est le seul qui nomme la vraie cause — un .doc
+      // au lieu d'un .docx, par exemple. Le remplacer par une phrase sur
+      // l'archive LinkedIn envoyait chercher le problème là où il n'était pas.
+      setError(
+        failure instanceof Error && failure.message
+          ? failure.message
+          : "Ce fichier n'a pas pu être ouvert. Attendu : un CV Word ou PDF, ou l'archive LinkedIn.",
+      )
       setData(null)
     } finally {
       setBusy(false)
@@ -216,7 +226,7 @@ export function LinkedInModal({
           <input
             ref={input}
             type="file"
-            accept=".docx,.pdf,.zip,.csv"
+            accept=".docx,.doc,.pdf,.zip,.csv"
             multiple
             className="hidden"
             onChange={(event) => void handleFiles(event.target.files)}

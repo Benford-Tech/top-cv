@@ -23,6 +23,8 @@ export type LinkedInImport = {
   summary: string
   city: string
   email: string
+  /** Absent des exports LinkedIn ; renseigne quand l'import vient d'un CV. */
+  phone: string
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
@@ -174,6 +176,7 @@ const EMPTY: LinkedInImport = {
   summary: '',
   city: '',
   email: '',
+  phone: '',
   experiences: [],
   education: [],
   skills: [],
