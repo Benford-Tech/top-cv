@@ -241,7 +241,7 @@ export default function App({ initialAuthOpen = false }: { initialAuthOpen?: boo
 
           <div className="px-4 py-4">
             {tab === 'contenu' ? (
-              <EditorPanel store={store} />
+              <EditorPanel store={store} token={auth.session?.access_token ?? null} />
             ) : (
               <DesignPanel settings={resume.settings} onChange={updateSettings} />
             )}

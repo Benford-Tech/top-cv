@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
     "@sparticuz/chromium": "^149.0.0",
     "@supabase/supabase-js": "^2.112.4",
     "fflate": "^0.8.3",

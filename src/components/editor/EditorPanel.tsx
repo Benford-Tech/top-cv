@@ -8,6 +8,7 @@ import { LinkedInModal } from './LinkedInModal'
 import { SectionCard } from './SectionCard'
 import { EntryCard } from './EntryCard'
 import { SuggestionPicker } from './SuggestionPicker'
+import { RedactionAssistant } from './RedactionAssistant'
 
 type Store = ReturnType<typeof useResume>
 
@@ -17,7 +18,7 @@ function append(current: string, phrase: string): string {
   return `${current.replace(/\s+$/, '')}\n${phrase}`
 }
 
-export function EditorPanel({ store }: { store: Store }) {
+export function EditorPanel({ store, token }: { store: Store; token: string | null }) {
   const {
     resume,
     updatePersonal,
@@ -205,6 +206,14 @@ export function EditorPanel({ store }: { store: Store }) {
           onChange={(event) => update({ summary: event.target.value })}
           placeholder="Cheffe de projet digital avec 7 ans d'expérience…"
         />
+        <RedactionAssistant
+          kind="summary"
+          token={token}
+          current={resume.summary}
+          role={resume.personal.title}
+          onReplace={(text) => update({ summary: text })}
+          onAppend={(text) => update({ summary: append(resume.summary, text) })}
+        />
       </SectionCard>
 
       {/* ---- Expériences ---- */}
@@ -306,6 +315,21 @@ export function EditorPanel({ store }: { store: Store }) {
                   updateItem('experiences', item.id, { description: event.target.value })
                 }
                 placeholder={'Pilotage de 6 projets simultanés…\nRéduction de 30 % des délais…'}
+              />
+              <RedactionAssistant
+                kind="bullets"
+                token={token}
+                current={item.description}
+                role={item.position}
+                company={item.company}
+                onReplace={(text) =>
+                  updateItem('experiences', item.id, { description: text })
+                }
+                onAppend={(text) =>
+                  updateItem('experiences', item.id, {
+                    description: append(item.description, text),
+                  })
+                }
               />
             </div>
           </EntryCard>

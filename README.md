@@ -218,7 +218,8 @@ Trois verrous, du plus externe au plus interne :
 
 ### Mise en place
 
-1. Créer un projet Supabase, exécuter `supabase/schema.sql` dans son éditeur SQL.
+1. Créer un projet Supabase, exécuter `supabase/schema.sql` dans son éditeur SQL
+   (il crée `resumes` et `ai_usage`).
 2. Renseigner les variables de `.env.example` dans Vercel.
 3. Déclarer le webhook Stripe vers `https://votre-domaine/api/stripe-webhook`,
    événement `checkout.session.completed`, et reporter son secret de signature
@@ -251,6 +252,63 @@ relire.
 Le texte du `.docx` est extrait avec `fflate`, déjà présent pour l'archive
 LinkedIn : un `.docx` est une archive ZIP dont `word/document.xml` porte le
 contenu. Aucune dépendance supplémentaire.
+
+## Aide à la rédaction
+
+L'éditeur propose, sous le champ Profil et sous chaque description
+d'expérience, une aide à la rédaction adossée à Claude : **Améliorer**,
+**Raccourcir**, **Mettre les résultats en avant**, **Rédiger une première
+version**. Le texte s'écrit au fil de l'eau et s'affiche **à côté du champ** —
+il n'y entre que si l'utilisateur choisit « Remplacer » ou « Ajouter à la
+suite ». Rien n'est modifié sans son geste.
+
+Le modèle a pour consigne explicite de **ne rien inventer** : aucun employeur,
+diplôme, date ni chiffre absent de ce qui lui est donné. Là où un chiffre
+renforcerait la phrase, il laisse un repère à compléter — `[taille de
+l'équipe]`, `[budget]` — plutôt qu'une valeur plausible. Un CV engage la
+personne qui le signe ; une statistique inventée s'y retourne contre elle en
+entretien.
+
+### Ce que la mise en place demande
+
+1. `ANTHROPIC_API_KEY` dans les variables d'environnement du déploiement.
+2. `supabase/schema.sql` rejoué : il crée la table `ai_usage` du compteur.
+
+Sans la clé, l'endpoint répond 501 et l'interface **masque** la fonction ; les
+suggestions écrites d'avance restent accessibles, sans compte et sans clé.
+
+### Pourquoi une fonction serveur, un compte et un quota
+
+Trois raisons distinctes, qui se cumulent :
+
+- **La clé.** Comme pour l'import LinkedIn, elle n'a rien à faire dans un
+  bundle public. Le navigateur ne parle qu'à `/api/redaction`.
+- **Le compte.** Un point d'entrée ouvert vers un modèle facturé au jeton est
+  un portefeuille ouvert : n'importe qui pourrait l'appeler en boucle.
+- **Le quota.** 40 réécritures par jour et par compte (`AI_DAILY_QUOTA`). Le
+  compteur suit la règle déjà appliquée au droit de télécharger : le client
+  peut le lire, jamais l'écrire — seule la fonction serveur, qui détient la
+  clé de service, l'incrémente. Le décompte tient dans une seule instruction
+  SQL (`consume_ai_quota`) : lire puis écrire depuis la fonction laisserait
+  passer un appel de trop à chaque paire de demandes simultanées. Sans
+  `SUPABASE_SERVICE_ROLE_KEY`, la fonction refuse plutôt que d'appeler sans
+  garde-fou.
+
+### Détails d'implémentation
+
+Modèle `claude-opus-5`, effort `low` : une réécriture courte et bien cadrée
+n'en demande pas davantage, et la main revient vite — ce qui compte pour une
+aide qui s'écrit sous les yeux. Si les propositions paraissent trop pauvres,
+c'est le premier réglage à monter (`output_config.effort` dans
+`api/redaction.ts`).
+
+Le repli côté serveur est activé (`fallbacks: "default"`) : si les
+classificateurs déclinent la demande, elle est rejouée sur un autre modèle au
+lieu de revenir en erreur.
+
+Le passage à réécrire est délimité et annoncé au modèle comme de la matière,
+jamais comme des instructions : il peut venir d'un CV importé, dont le contenu
+n'est pas maîtrisé.
 
 ## Import LinkedIn
 

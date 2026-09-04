@@ -66,7 +66,21 @@ function apiDevServer(): Plugin {
 
             res.statusCode = response.status
             response.headers.forEach((value, key) => res.setHeader(key, value))
-            res.end(Buffer.from(await response.arrayBuffer()))
+
+            // Le corps est recopié au fil de l'eau et non mis en tampon :
+            // l'aide à la rédaction diffuse son texte, et l'attendre en entier
+            // en local donnerait un comportement que le déploiement n'a pas.
+            if (!response.body) {
+              res.end()
+              return
+            }
+            const reader = response.body.getReader()
+            for (;;) {
+              const { done, value } = await reader.read()
+              if (done) break
+              res.write(Buffer.from(value))
+            }
+            res.end()
           } catch (error) {
             // Une erreur de la fonction doit rester lisible et rester du JSON :
             // c'est ce que le client sait interpréter.
