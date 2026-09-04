@@ -1,6 +1,7 @@
 import type { LinkedInImport } from './linkedin'
 import { uid } from './id'
 import { parseResumeLines } from './cvParser'
+import { readPageText, type TextItem } from './pdfText'
 
 /**
  * Lecture du PDF que LinkedIn produit via « Enregistrer au format PDF ».
@@ -222,6 +223,22 @@ export function parseLinkedInPdfText(text: string): LinkedInImport {
   return result
 }
 
+/**
+ * Richesse d'une lecture, pour departager deux analyses du meme document.
+ *
+ * Les experiences et les formations pesent le plus : ce sont elles qui coutent
+ * a ressaisir, et celles qu'un lecteur inadapte manque en premier. Les
+ * competences et les langues, listes plates, se recuperent presque toujours.
+ */
+function score(lecture: LinkedInImport): number {
+  return (
+    lecture.experiences.length * 3 +
+    lecture.education.length * 2 +
+    lecture.skills.length +
+    lecture.languages.length
+  )
+}
+
 /** Extrait le texte du PDF, page par page, dans l'ordre de lecture. */
 export async function readLinkedInPdf(file: File): Promise<LinkedInImport> {
   // Chargement a la demande : la bibliotheque pese lourd et ne sert qu'ici.
@@ -232,34 +249,37 @@ export async function readLinkedInPdf(file: File): Promise<LinkedInImport> {
   ).toString()
 
   const document = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise
-  const pages: string[] = []
+  const lines: string[] = []
 
   for (let index = 1; index <= document.numPages; index += 1) {
     const page = await document.getPage(index)
     const content = await page.getTextContent()
-    let text = ''
-    let lastY: number | null = null
+    const items: TextItem[] = []
     for (const item of content.items) {
-      if (!('str' in item)) continue
-      const y = item.transform[5] as number
-      // Le PDF ne contient pas de retours a la ligne, seulement des positions :
-      // un saut vertical marque donc une nouvelle ligne.
-      if (lastY !== null && Math.abs(y - lastY) > 2) text += '\n'
-      text += item.str
-      lastY = y
+      if (!('str' in item) || !item.str.trim()) continue
+      items.push({
+        str: item.str,
+        x: item.transform[4] as number,
+        y: item.transform[5] as number,
+        width: item.width,
+        height: item.height,
+      })
     }
-    pages.push(text)
+    lines.push(...readPageText(items, page.getViewport({ scale: 1 }).width))
   }
 
-  const text = pages.join('\n')
+  const text = lines.join('\n')
   const parsed = parseLinkedInPdfText(text)
 
-  // Tous les PDF deposes ici ne viennent pas de LinkedIn : quand la structure
-  // de l'export n'est pas reconnue, on retombe sur l'analyse generique, qui
-  // sait lire un CV ordinaire.
-  const utile =
-    parsed.experiences.length > 0 || parsed.education.length > 0 || parsed.skills.length > 0
-  const resultat = utile ? parsed : parseResumeLines(text.split('\n'))
+  // Tous les PDF deposes ici ne viennent pas de LinkedIn. Les deux lecteurs
+  // sont donc essayes, et le plus fructueux l'emporte.
+  //
+  // Le depart se faisait auparavant sur « le lecteur LinkedIn a-t-il trouve
+  // quelque chose », competences comprises : or tout CV porte une rubrique
+  // Competences, si bien qu'un CV ordinaire n'atteignait jamais le lecteur
+  // generique et perdait toutes ses experiences en chemin.
+  const generique = parseResumeLines(lines)
+  const resultat = score(parsed) >= score(generique) ? parsed : generique
 
   resultat.filesUsed = [file.name]
   return resultat

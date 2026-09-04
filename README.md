@@ -310,6 +310,34 @@ Le passage à réécrire est délimité et annoncé au modèle comme de la mati�
 jamais comme des instructions : il peut venir d'un CV importé, dont le contenu
 n'est pas maîtrisé.
 
+### Ce qu'un PDF exige de plus qu'un document Word
+
+Un PDF ne contient ni lignes, ni paragraphes, ni colonnes : seulement des
+fragments de texte posés à des coordonnées. `src/lib/pdfText.ts` reconstitue
+ce que l'œil voit, en trois passes.
+
+- **Les lignes**, par position verticale, les fragments d'une même ligne
+  remis dans l'ordre horizontal et les blancs typographiques rétablis — un
+  espace, dans un PDF, est une position, pas un caractère.
+- **Les colonnes**, en cherchant une gouttière : une bande verticale que
+  nul fragment ne traverse, assez large et assez centrée. Chaque colonne est
+  alors lue entièrement avant la suivante. Sans cela, un CV en deux colonnes
+  se lit de travers : les fragments de gauche et de droite qui partagent une
+  hauteur se collent bout à bout, et les langues finissent dans les
+  compétences.
+- **Les paragraphes**, en recollant les replis. Une puce de cinq lignes en
+  donne cinq, coupées en pleine phrase ; elles sont réunies quand la suivante
+  commence en minuscule, ou quand la précédente reste suspendue à un
+  séparateur.
+
+Les mentions déposées par les banques de modèles — « This template was
+created by Slidesgo » — sont écartées : posées en tête de page, elles étaient
+prises pour le nom du candidat.
+
+Le lecteur LinkedIn et le lecteur générique sont ensuite lancés tous les
+deux, et le plus fructueux l'emporte : les expériences et les formations
+comptent triple et double, étant ce qui coûte à ressaisir.
+
 ## Import LinkedIn
 
 L'application peut préremplir un CV depuis LinkedIn : expériences, formations,
@@ -499,3 +527,7 @@ formulations de missions (`bullets`).
   pagination qui déplacerait automatiquement une section vers la page suivante.
 - Pas de compte utilisateur : un CV vit dans le navigateur où il a été saisi,
   l'export JSON sert à le transporter ailleurs.
+- À l'import, une rubrique que rien ne permet de rattacher — « Extra-curriculum »,
+  « Vie associative » — est reconnue comme rubrique, donc elle n'est plus versée
+  dans les compétences, mais son contenu n'est pas repris pour autant : le CV
+  n'a pas de section où le mettre. À ressaisir à la main.

@@ -1,5 +1,6 @@
 import type { LinkedInImport } from './linkedin'
 import { uid } from './id'
+import { TEMPLATE_CREDIT } from './pdfText'
 
 /**
  * Analyse d'un CV existant, quel que soit son origine : document Word, ou PDF
@@ -41,6 +42,27 @@ function normalise(value: string): string {
     .trim()
 }
 
+/**
+ * Une rubrique dont l'intitule ne figure pas dans la liste ci-dessus.
+ *
+ * Sans cette reconnaissance, « EXTRA-CURRICULUM » et tout ce qui le suit
+ * s'ajoutaient aux competences, jauge comprise. Un CV comporte toujours des
+ * rubriques qu'aucune liste ne prevoit ; ce qu'il faut reconnaitre, c'est
+ * qu'une rubrique commence, pas laquelle.
+ *
+ * Prudence assumee : capitales, plusieurs mots, ni chiffre ni virgule ni
+ * barre oblique. Un intitule de rubrique est presque toujours de cette forme,
+ * et une competence isolee — « SQL », « HTML/CSS » — presque jamais. Le prix
+ * de l'erreur reste une competence perdue au lieu d'une rubriquee entiere
+ * deversee dans une autre.
+ */
+function looksLikeHeading(line: string): boolean {
+  if (line.length < 6 || line.length > 45) return false
+  if (/[\d,/]/.test(line)) return false
+  if (!/[\s-]/.test(line.trim())) return false
+  return line === line.toUpperCase() && /[A-ZÀ-Þ]/.test(line)
+}
+
 function headingFor(line: string): Section | null {
   if (line.length > 45) return null
   const clean = normalise(line)
@@ -48,7 +70,7 @@ function headingFor(line: string): Section | null {
   for (const [section, labels] of HEADINGS) {
     if (labels.includes(clean)) return section
   }
-  return null
+  return looksLikeHeading(line) ? 'other' : null
 }
 
 const MONTHS: Record<string, string> = {
@@ -213,7 +235,7 @@ export function splitCity(value: string): { value: string; city: string } {
   return { value: head, city: tail }
 }
 
-const LIST_SEPARATOR = /\s*[,;·•|\/]\s*/
+const LIST_SEPARATOR = /\s*[,;·•|]\s*/
 
 const EMPTY: LinkedInImport = {
   firstName: '', lastName: '', linkedinUrl: '', headline: '', summary: '', city: '', email: '', phone: '',
@@ -222,7 +244,10 @@ const EMPTY: LinkedInImport = {
 }
 
 export function parseResumeLines(input: string[]): LinkedInImport {
-  const lines = input.map(tidy).filter(Boolean)
+  // Les mentions des banques de modeles (« This template was created by
+  // Slidesgo ») sont ecartees avant toute analyse : posees en tete de page,
+  // elles etaient prises pour le nom du candidat.
+  const lines = input.map(tidy).filter((line) => line && !TEMPLATE_CREDIT.test(line))
 
   const result: LinkedInImport = {
     ...EMPTY,
@@ -288,21 +313,41 @@ export function parseResumeLines(input: string[]): LinkedInImport {
   if (profileLines?.length) result.summary = profileLines.join(' ')
 
   // --- Experiences et formations, ancrees sur les dates ---------------------
-  function collect(section: Section) {
+  type Entry = {
+    /** Ce que portait la ligne de dates, une fois la date retiree. */
+    dated: string
+    /** Lignes situees au-dessus de la date, la plus proche en dernier. */
+    above: string[]
+    body: string[]
+    range: DateRange
+  }
+
+  function collect(section: Section): Entry[] {
     const source = sections.get(section) ?? []
-    const entries: { head: string[]; body: string[]; range: DateRange }[] = []
+    const entries: Entry[] = []
     let buffer: string[] = []
 
-    for (const line of source) {
+    for (const [index, line] of source.entries()) {
       const range = findRange(line)
       if (!range) {
         const last = entries[entries.length - 1]
+        // Une ligne ordinaire suivie d'une ligne de dates annonce l'entrée
+        // suivante, ce n'est pas la fin du descriptif de la précédente :
+        // « Consultante junior » puis « ACCENTURE, Paris | sept. 2016 … ».
+        // Sans ce regard en avant, l'intitulé du poste suivant se retrouvait
+        // noyé dans la description du précédent, qui gardait le nom de
+        // l'employeur pour intitulé.
+        const next = source[index + 1]
+        if (!BULLET.test(line) && next && findRange(next)) {
+          buffer.push(line)
+          continue
+        }
         // Une date seule sur sa ligne, l'intitule juste en dessous : c'est la
         // disposition la plus repandue sous Word. Tant que l'entree ouverte
-        // n'a pas d'en-tete, la premiere ligne qui suit en tient lieu — sauf
-        // une puce, qui appartient toujours au descriptif.
-        if (last && last.head.length === 0 && !BULLET.test(line)) {
-          last.head.push(line)
+        // n'a rien pour se nommer, la premiere ligne qui suit en tient lieu —
+        // sauf une puce, qui appartient toujours au descriptif.
+        if (last && !last.dated && last.above.length === 0 && !BULLET.test(line)) {
+          last.above.push(line)
           continue
         }
         if (last && buffer.length === 0) {
@@ -312,21 +357,42 @@ export function parseResumeLines(input: string[]): LinkedInImport {
         buffer.push(line)
         continue
       }
-      // La date porte parfois l'intitule sur la meme ligne ; sinon on reprend
-      // les lignes qui la precedent.
-      const head = range.rest ? [range.rest, ...buffer] : buffer
-      entries.push({ head, body: [], range })
+      entries.push({ dated: range.rest, above: buffer, body: [], range })
       buffer = []
     }
     return entries
   }
 
+  /**
+   * Repartit intitule et employeur entre la ligne de dates et celles qui la
+   * precedent.
+   *
+   * Quand les deux existent — « Consultante en strategie » au-dessus de
+   * « WAVESTONE - Consulting ... | fevr. 2018 - mars 2021 » —, la ligne du
+   * dessus est l'intitule et la ligne datee porte l'employeur. Les prendre
+   * toutes deux depuis la ligne datee, comme auparavant, faisait de
+   * « WAVESTONE » le poste et jetait le vrai intitule.
+   */
+  function nameEntry(entry: Entry): { title: string; org: string } {
+    const closest = entry.above[entry.above.length - 1] ?? ''
+
+    if (entry.dated && closest) {
+      // Sur la ligne datee, seul le premier segment nomme l'employeur : le
+      // reste le decrit (« WAVESTONE - Consulting en management »).
+      const { position } = splitRole(entry.dated)
+      return { title: closest, org: position || entry.dated }
+    }
+
+    const { position, company } = splitRole(entry.dated || closest)
+    return { title: position, org: company || entry.above[0] || '' }
+  }
+
   for (const entry of collect('experience')) {
-    const { position, company } = splitRole(entry.head[0] ?? '')
-    const employer = splitCity(company || entry.head[1] || '')
+    const { title, org } = nameEntry(entry)
+    const employer = splitCity(org)
     result.experiences.push({
       id: uid(),
-      position,
+      position: title,
       company: employer.value,
       city: employer.city,
       start: entry.range.start,
@@ -337,11 +403,11 @@ export function parseResumeLines(input: string[]): LinkedInImport {
   }
 
   for (const entry of collect('education')) {
-    const { position, company } = splitRole(entry.head[0] ?? '')
-    const school = splitCity(company || entry.head[1] || '')
+    const { title, org } = nameEntry(entry)
+    const school = splitCity(org)
     result.education.push({
       id: uid(),
-      degree: position,
+      degree: title,
       school: school.value,
       city: school.city,
       start: entry.range.start,
@@ -352,9 +418,15 @@ export function parseResumeLines(input: string[]): LinkedInImport {
 
   // --- Competences et langues ----------------------------------------------
   for (const line of sections.get('skills') ?? []) {
-    for (const name of line.replace(/^[-•·]\s*/, '').split(LIST_SEPARATOR)) {
-      const clean = name.trim()
-      if (clean && clean.length < 60) result.skills.push({ id: uid(), name: clean, level: 4 })
+    for (const chunk of line.replace(/^[-•·]\s*/, '').split(LIST_SEPARATOR)) {
+      // « HTML/CSS/JS » enumere trois competences ; « Gestion de projet /
+      // programme » n'en nomme qu'une. La barre oblique ne separe donc que
+      // lorsqu'elle est collee, sans espace autour.
+      const pieces = /\s/.test(chunk.trim()) ? [chunk] : chunk.split('/')
+      for (const piece of pieces) {
+        const clean = piece.trim()
+        if (clean && clean.length < 60) result.skills.push({ id: uid(), name: clean, level: 4 })
+      }
     }
   }
 
